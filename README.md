@@ -186,4 +186,3 @@ portfolio, but if you want a second lock: cPanel → **Directory Privacy** →
 `public_html` → and password-protect `admin.html` at the server level too.
 
 Never leave `hash.php` on the live server.
-# itssky
