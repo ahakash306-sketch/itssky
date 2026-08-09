@@ -3,22 +3,27 @@
    (same tab via subscribe, other tabs via the storage event). */
 (function () {
   var CKEY = "akash.cms.v1";
+  var DKEY = "akash.cms.draft.v1";
   var MKEY = "akash.metrics.v1";
+  /* The panel edits a DRAFT; the site renders the PUBLISHED copy. Nothing a
+     visitor sees changes until Publish copies draft -> published (and server). */
+  var draftMode = false;
+  function activeKey() { return draftMode ? DKEY : CKEY; }
 
   /* Text fields the Admin panel can edit. `key` matches data-cms="" in the site. */
   var FIELDS = [
-    { key: "hero.eyebrow", label: "Hero eyebrow", group: "Hero", type: "text" },
-    { key: "hero.title", label: "Hero headline", group: "Hero", type: "rich", hint: "Wrap a word in <span class=\"em\" style=\"color: var(--color-accent)\">…</span> to accent it." },
-    { key: "hero.sub", label: "Hero subline", group: "Hero", type: "area" },
-    { key: "about.lead", label: "Opening line", group: "About", type: "area" },
-    { key: "about.p2", label: "Paragraph 2", group: "About", type: "area" },
-    { key: "about.p3", label: "Paragraph 3", group: "About", type: "area" },
-    { key: "journey.title", label: "Section title", group: "Journey", type: "rich" },
-    { key: "journey.sub", label: "Section subline", group: "Journey", type: "text" },
-    { key: "craft.eyebrow", label: "Section eyebrow", group: "Craft", type: "text" },
-    { key: "craft.title", label: "Section title", group: "Craft", type: "rich" },
-    { key: "connect.title", label: "Section title", group: "Connect", type: "rich" },
-    { key: "connect.body", label: "Section body", group: "Connect", type: "area" }
+    { key: "hero.eyebrow", label: "Greeting pill", group: "Hero", type: "text", hint: "The small rounded label above the headline." },
+    { key: "hero.title", label: "Main headline", group: "Hero", type: "rich", hint: "Select any word and use the toolbar to make it the italic accent style." },
+    { key: "hero.sub", label: "Sub-headline", group: "Hero", type: "area", hint: "The line of grey copy under the headline." },
+    { key: "about.lead", label: "Opening statement", group: "About", type: "area", hint: "The large first sentence of the About section." },
+    { key: "about.p2", label: "Second paragraph", group: "About", type: "area" },
+    { key: "about.p3", label: "Third paragraph", group: "About", type: "area" },
+    { key: "journey.title", label: "Section heading", group: "Journey", type: "rich" },
+    { key: "journey.sub", label: "Line under the heading", group: "Journey", type: "text" },
+    { key: "craft.eyebrow", label: "Small label above heading", group: "What I bring to the table", type: "text" },
+    { key: "craft.title", label: "Section heading", group: "What I bring to the table", type: "rich" },
+    { key: "connect.title", label: "Closing headline", group: "Connect", type: "rich" },
+    { key: "connect.body", label: "Closing paragraph", group: "Connect", type: "area" }
   ];
 
   var GROUPS = ["live", "cases", "labs"];
@@ -29,26 +34,29 @@
   }
   function writeJSON(k, v) {
     try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
-    /* Content edits are unpublished until the panel pushes them to the server. */
-    if (k === CKEY) { try { localStorage.setItem("akash.cms.dirty", "1"); } catch (e) {} }
+    if (k === DKEY) { try { localStorage.setItem("akash.cms.dirty", "1"); } catch (e) {} }
     listeners.forEach(function (fn) { try { fn(); } catch (e) {} });
   }
 
   var listeners = [];
   window.addEventListener("storage", function (e) {
-    if (e.key === CKEY || e.key === MKEY) listeners.forEach(function (fn) { try { fn(); } catch (err) {} });
+    if (e.key === CKEY || e.key === DKEY || e.key === MKEY) listeners.forEach(function (fn) { try { fn(); } catch (err) {} });
   });
 
   /* ---------- content ---------- */
-  function store() { return readJSON(CKEY, {}); }
+  /* In draft mode the draft seeds itself from the published copy on first read. */
+  function store() {
+    return draftMode ? readJSON(DKEY, readJSON(CKEY, {})) : readJSON(CKEY, {});
+  }
+  function published() { return readJSON(CKEY, {}); }
   function text() { return store().text || {}; }
   function setText(key, value) {
     var s = store();
     s.text = s.text || {};
     if (value === null || value === undefined || value === "") delete s.text[key]; else s.text[key] = value;
-    writeJSON(CKEY, s);
+    writeJSON(activeKey(), s);
   }
-  function resetText() { var s = store(); delete s.text; writeJSON(CKEY, s); }
+  function resetText() { var s = store(); delete s.text; writeJSON(activeKey(), s); }
 
   /* Overwrite every [data-cms] node in the document with its override, if any. */
   /* The DC runtime annotates nodes with data-dc- and data-om- attributes; those must
@@ -102,7 +110,7 @@
     var s = store();
     s.defaults = Object.assign({}, s.defaults || {}, out);
     s.tags = Object.assign({}, s.tags || {}, tags);
-    writeJSON(CKEY, s);
+    writeJSON(activeKey(), s);
   }
   /* Case-study copy lives inside views that are only mounted when open, so the panel
      harvests every data-cms default straight from the source file instead. */
@@ -135,7 +143,7 @@
         st.tags[k] = el.tagName.toLowerCase();
         st.order.push({ key: k, kind: "text", tag: el.tagName.toLowerCase() });
       });
-      writeJSON(CKEY, st);
+      writeJSON(activeKey(), st);
       return added;
     }).catch(function () { return 0; });
   }
@@ -154,7 +162,7 @@
     var nk = ns ? key.replace(/^(ws|bu)\./, "$1@" + ns + ".") : key;
     if (!value || (!value.src && !value.type)) delete st.media[nk];
     else st.media[nk] = value;
-    writeJSON(CKEY, st);
+    writeJSON(activeKey(), st);
   }
   /* Swap the authored element for whatever the CMS says should be there. */
   function applyMedia(root, ns) {
@@ -195,7 +203,7 @@
   function setCaseDefaults(obj) {
     var s = store();
     s.caseDefaults = JSON.parse(JSON.stringify(obj));
-    writeJSON(CKEY, s);
+    writeJSON(activeKey(), s);
   }
   function caseDefaults() { return store().caseDefaults || {}; }
   function defaults() {
@@ -220,8 +228,8 @@
       return Object.assign({}, byId[p.id] || {}, p);
     });
   }
-  function saveProjects(list) { var s = store(); s.projects = list; writeJSON(CKEY, s); }
-  function resetProjects() { var s = store(); delete s.projects; writeJSON(CKEY, s); }
+  function saveProjects(list) { var s = store(); s.projects = list; writeJSON(activeKey(), s); }
+  function resetProjects() { var s = store(); delete s.projects; writeJSON(activeKey(), s); }
 
   /* ---------- per-case detail (data-driven "Live Products" format) ---------- */
   function detail(id) { return (store().details || {})[id] || {}; }
@@ -239,12 +247,12 @@
     /* null/"" clears the override so the site's built-in value shows through again. */
     if (value === null || value === undefined || value === "") delete node[leaf];
     else node[leaf] = value;
-    writeJSON(CKEY, st);
+    writeJSON(activeKey(), st);
   }
   function resetDetail(id) {
     var st = store();
     if (st.details) delete st.details[id];
-    writeJSON(CKEY, st);
+    writeJSON(activeKey(), st);
   }
 
   /* Long-form formats (WorkSpace, BUSEit) are markup, so their fields are derived
@@ -297,7 +305,7 @@
         if (p && (src.source || id) === id) st.text[p[1] + "@" + newId + "." + p[2]] = st.text[k];
       }
     });
-    writeJSON(CKEY, st);
+    writeJSON(activeKey(), st);
     return newId;
   }
 
@@ -435,7 +443,8 @@
       remote.admin = !!(r.body && r.body.admin);
       remote.loaded = true;
       var c = r.body && r.body.content;
-      if (c && typeof c === "object" && Object.keys(c).length && !localStorage.getItem("akash.cms.dirty")) {
+      /* The published copy always mirrors the server; the draft is separate. */
+      if (c && typeof c === "object" && Object.keys(c).length) {
         try { localStorage.setItem(CKEY, JSON.stringify(c)); } catch (e) {}
       }
       notify();
@@ -451,18 +460,44 @@
 
   function publish() {
     remote.saving = true; remote.error = null; notify();
+    var draft = store();
     return api("save.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: store() })
+      body: JSON.stringify({ content: draft })
     }).then(function (r) {
       remote.saving = false;
       if (r.status === 401) { remote.admin = false; remote.error = "Sign in to publish."; notify(); return false; }
       if (!r.body || !r.body.ok) { remote.error = (r.body && r.body.error) || "Save failed."; notify(); return false; }
-      remote.lastSaved = r.body.saved; markDirty(false); notify(); return true;
+      remote.lastSaved = r.body.saved;
+      /* The draft becomes the published copy the site renders. */
+      try { localStorage.setItem(CKEY, JSON.stringify(draft)); } catch (e) {}
+      markDirty(false); notify(); return true;
     }).catch(function () {
-      remote.saving = false; remote.error = "Server unreachable."; notify(); return false;
+      remote.saving = false;
+      /* No server (local preview): publishing still promotes the draft locally. */
+      if (!remote.available) {
+        try { localStorage.setItem(CKEY, JSON.stringify(draft)); } catch (e) {}
+        markDirty(false); notify(); return true;
+      }
+      remote.error = "Server unreachable."; notify(); return false;
     });
+  }
+
+  /* Throw away everything edited since the last publish. */
+  function discardDraft() {
+    try { localStorage.removeItem(DKEY); } catch (e) {}
+    markDirty(false); notify();
+  }
+
+  /* Roll the live site back to the version published before the last one. */
+  function restoreLastPublish() {
+    return api("restore.php", { method: "POST" }).then(function (r) {
+      if (!r.body || !r.body.ok) { remote.error = (r.body && r.body.error) || "Nothing to restore."; notify(); return false; }
+      try { localStorage.removeItem(DKEY); } catch (e) {}
+      markDirty(false);
+      return loadRemote().then(function () { return true; });
+    }).catch(function () { remote.error = "Server unreachable."; notify(); return false; });
   }
 
   function login(password) {
@@ -479,12 +514,23 @@
   function logout() {
     return api("auth.php?action=logout").then(function () { remote.admin = false; notify(); });
   }
+  /* Local fallback when there is no PHP endpoint: keep the file in the page as a
+     data URL so the panel still previews it. Real hosting writes to /uploads. */
   function upload(file) {
     var fd = new FormData();
     fd.append("file", file);
     return api("upload.php", { method: "POST", body: fd }).then(function (r) {
-      return r.body && r.body.ok ? r.body.path : null;
-    }).catch(function () { return null; });
+      if (r.body && r.body.ok) return r.body.path;
+      return dataUrl(file);
+    }).catch(function () { return dataUrl(file); });
+  }
+  function dataUrl(file) {
+    return new Promise(function (res) {
+      var fr = new FileReader();
+      fr.onload = function () { res(fr.result); };
+      fr.onerror = function () { res(null); };
+      fr.readAsDataURL(file);
+    });
   }
   function remoteStats(clear) {
     return api("stats.php" + (clear ? "?clear=1" : "")).then(function (r) {
@@ -515,7 +561,10 @@
   loadRemote();
 
   window.CMS = {
-    CKEY: CKEY, MKEY: MKEY, FIELDS: FIELDS, GROUPS: GROUPS, GROUP_LABEL: GROUP_LABEL,
+    CKEY: CKEY, DKEY: DKEY, MKEY: MKEY, FIELDS: FIELDS, GROUPS: GROUPS, GROUP_LABEL: GROUP_LABEL,
+    enterDraftMode: function () { draftMode = true; },
+    isDirty: function () { try { return !!localStorage.getItem("akash.cms.dirty"); } catch (e) { return false; } },
+    discardDraft: discardDraft, restoreLastPublish: restoreLastPublish, published: published,
     remote: remote, loadRemote: loadRemote, publish: publish, login: login, logout: logout,
     upload: upload, remoteStats: remoteStats, markDirty: markDirty,
     text: text, setText: setText, resetText: resetText, applyText: applyText,

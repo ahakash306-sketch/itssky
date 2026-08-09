@@ -23,6 +23,30 @@
   ::-webkit-scrollbar { width: 9px; height: 9px; }
   ::-webkit-scrollbar-thumb { background: #23283a; border-radius: 8px; }
   @media (max-width: 860px) { .shell { grid-template-columns: 1fr !important; } .side { position: static !important; height: auto !important; flex-direction: row !important; overflow-x: auto; } }
+
+  /* --- rich text field --- */
+  .rt-wrap { border: 1px solid var(--edge); border-radius: 10px; background: #0e121b; overflow: hidden; }
+  .rt-wrap:focus-within { border-color: var(--accent); }
+  .rt-bar { display: none; flex-wrap: wrap; align-items: center; gap: 3px; padding: 6px 7px;
+    background: #121722; border-bottom: 1px solid var(--edge); }
+  .rt-wrap:focus-within .rt-bar, .rt-wrap:hover .rt-bar { display: flex; }
+  .rt-bar button, .rt-bar select {
+    height: 27px; min-width: 27px; padding: 0 7px; border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent; background: transparent; color: #c3c8d4; font-size: 12.5px; line-height: 1;
+  }
+  .rt-bar button:hover, .rt-bar select:hover { background: #1c2331; color: #fff; }
+  .rt-bar select { border-color: var(--edge); background: #0e121b; padding-right: 4px; }
+  .rt-bar .sep { width: 1px; height: 18px; background: var(--edge); margin: 0 4px; }
+  .rt-sw { width: 20px; height: 20px; min-width: 20px; padding: 0; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.22); cursor: pointer; }
+  .rt-sw:hover { transform: scale(1.12); }
+  .rt {
+    min-height: 44px; padding: 11px 13px; font-size: 14px; line-height: 1.65; color: #e9eaee;
+    outline: none; white-space: pre-wrap; word-break: break-word;
+  }
+  .rt:empty::before { content: attr(data-ph); color: #4d5464; }
+  /* Mirror the site's own accent type so what you style is what you get. */
+  .rt .em { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; }
 </style>
 </helmet>
 
@@ -37,7 +61,14 @@
     <button type="button" onClick="{{ goWork }}" style="{{ navWork }}">Work</button>
     <button type="button" onClick="{{ goStats }}" style="{{ navStats }}">Analytics</button>
     <div style="flex: 1;"></div>
-    <a href="Akash Portfolio.dc.html" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <button type="button" onClick="{{ doDiscard }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid var(--edge); background: transparent; color: #8b90a0; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Discard unpublished edits</button>
+      <button type="button" onClick="{{ doRestore }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,150,120,.28); background: transparent; color: #ffb59a; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #ffb59a;">Undo last publish</button>
+      <a href="index.html" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
+      <sc-if value="{{ onServer }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ doLogout }}" style="padding: 9px 12px; border-radius: 10px; border: 0; background: transparent; color: #5f6472; font-size: 12px; text-align: left; cursor: pointer;" style-hover="color: #fff;">Sign out</button>
+      </sc-if>
+    </div>
   </aside>
 
   <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ false }}">
@@ -69,10 +100,7 @@
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
         <button type="button" onClick="{{ doExport }}" style="padding: 9px 15px; border-radius: 999px; border: 1px solid var(--edge); background: var(--ink); color: var(--body-copy); font-size: 13px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Export JSON</button>
-        <sc-if value="{{ onServer }}" hint-placeholder-val="{{ false }}">
-          <button type="button" onClick="{{ doPublish }}" style="{{ publishStyle }}">{{ publishLabel }}</button>
-          <button type="button" onClick="{{ doLogout }}" style="padding: 9px 14px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #8b90a0; font-size: 13px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Sign out</button>
-        </sc-if>
+        <button type="button" onClick="{{ doPublish }}" style="{{ publishStyle }}">{{ publishLabel }}</button>
         <span style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px; border: 1px solid rgba(110,163,255,.35); background: rgba(110,163,255,.08); font-size: 13px; color: var(--accent);">{{ savedLabel }}</span>
       </div>
     </div>
@@ -80,7 +108,7 @@
     <sc-if value="{{ needsSite }}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 16px; padding: 15px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
         <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">Open the portfolio once so the panel can read its current copy — until then text fields have nothing to load.</p>
-        <a href="Akash Portfolio.dc.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+        <a href="index.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
       </div>
     </sc-if>
 
@@ -95,7 +123,36 @@
               </div>
               <button type="button" onClick="{{ f.reset }}" style="flex: none; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #7d8394; font-size: 11.5px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Revert</button>
             </div>
-            <textarea onInput="{{ f.onInput }}" value="{{ f.value }}" rows="{{ f.rows }}" disabled="{{ f.disabled }}" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 14px; line-height: 1.6;"></textarea>
+            <div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #6b7080;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+  </div>
             <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
               <p style="margin: 8px 0 0; font-size: 11.5px; color: #6b7080;">{{ f.hint }}</p>
             </sc-if>
@@ -172,8 +229,41 @@
                 </select>
               </label>
             </sc-if>
-            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card image path</span><input onInput="{{ e.setImg }}" value="{{ e.img }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;"></label>
-            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card description</span><textarea onInput="{{ e.setBody }}" value="{{ e.body }}" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px; line-height: 1.6;"></textarea></label>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card thumbnail — shown on the work list</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <input onInput="{{ e.setImg }}" value="{{ e.img }}" placeholder="uploads/cover.jpg" style="flex: 1; min-width: 200px; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;">
+                <button type="button" onClick="{{ e.uploadImg }}" style="flex: none; padding: 10px 16px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo</button>
+              </div></label>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card description</span><div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #6b7080;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="One or two lines about this project…" ref="{{ e.bodyRef }}" onInput="{{ e.bodyInput }}"></div>
+  </div></label>
           </div>
         </sc-if>
 
@@ -203,7 +293,7 @@
                         </sc-if>
                         <input onInput="{{ f.onInput }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" style="flex: 1; min-width: 180px; box-sizing: border-box; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 12.5px;">
                         <sc-if value="{{ canUpload }}" hint-placeholder-val="{{ false }}">
-                          <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload</button>
+                          <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo / video</button>
                         </sc-if>
                         <sc-if value="{{ f.isVideo }}" hint-placeholder-val="{{ false }}">
                           <span style="flex: none; padding: 4px 9px; border-radius: 999px; background: rgba(110,163,255,.14); color: #cfe0ff; font-size: 11px;">autoplay · loop · muted</span>
@@ -211,7 +301,36 @@
                       </div>
                     </sc-if>
                     <sc-if value="{{ f.text }}" hint-placeholder-val="{{ true }}">
-                      <textarea onInput="{{ f.onInput }}" value="{{ f.value }}" rows="{{ f.rows }}" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px; line-height: 1.6;"></textarea>
+                      <div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #6b7080;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+  </div>
                     </sc-if>
                   </div>
                 </sc-for>
@@ -222,7 +341,7 @@
           <sc-if value="{{ needsReload }}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
               <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">This page's fields load from the site itself. Open the portfolio once (or reload it if it's already open), then come back.</p>
-              <a href="Akash Portfolio.dc.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+              <a href="index.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
             </div>
           </sc-if>
 
@@ -362,6 +481,9 @@ class Component extends DCLogic {
   state = { page: "content", editing: null, editTab: "card", saved: "", tick: 0 };
 
   componentDidMount() {
+    /* The panel always edits the draft copy, never what visitors are served. */
+    if (window.CMS) window.CMS.enterDraftMode();
+    document.addEventListener("selectionchange", this.rtRemember);
     this.off = window.CMS && window.CMS.onChange(() => this.setState((s) => ({ tick: s.tick + 1 })));
     this.timer = setInterval(() => {
       if (this.state.page !== "stats") return;
@@ -372,7 +494,11 @@ class Component extends DCLogic {
     /* Pull every editable field out of the site's source so no page visit is needed. */
     if (window.CMS) window.CMS.harvestFromSource("Akash Portfolio.dc.html").then(() => this.setState((s) => ({ tick: s.tick + 1 })));
   }
-  componentWillUnmount() { if (this.off) this.off(); clearInterval(this.timer); }
+  componentWillUnmount() {
+    if (this.off) this.off();
+    clearInterval(this.timer);
+    document.removeEventListener("selectionchange", this.rtRemember);
+  }
 
   /* Opens the OS file picker, sends the file to the server, hands back its path. */
   pickFile(done) {
@@ -386,7 +512,8 @@ class Component extends DCLogic {
       window.CMS.upload(file).then((path) => {
         if (!path) { this.flash("Upload failed"); return; }
         done(path);
-        this.flash("Uploaded");
+        /* A data: URL means there was no server to write /uploads on. */
+        this.flash(/^data:/.test(path) ? "Added (local preview)" : "Uploaded to /uploads");
       });
     };
     input.click();
@@ -400,6 +527,99 @@ class Component extends DCLogic {
 
   dirty() {
     try { return !!localStorage.getItem("akash.cms.dirty"); } catch (e) { return false; }
+  }
+
+  /* --- rich text -------------------------------------------------------
+     A contenteditable per field. The toolbar acts on the live selection, so
+     buttons must never take focus (mousedown is prevented in the template). */
+  rtExec(cmd, val) {
+    try { document.execCommand("styleWithCSS", false, true); } catch (e) {}
+    document.execCommand(cmd, false, val || null);
+    this.rtCommit();
+  }
+  /* Wrap the selection in a span carrying one CSS property. */
+  rtStyle(prop, value) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.style[prop] = value;
+    try {
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      sel.removeAllRanges();
+      const r = document.createRange();
+      r.selectNodeContents(span);
+      sel.addRange(r);
+    } catch (e) {}
+    this.rtCommit();
+  }
+  /* The serif accent used across the site, applied as one action. */
+  rtAccentFont() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.className = "em";
+    span.style.fontFamily = '"Instrument Serif", Georgia, serif';
+    span.style.fontStyle = "italic";
+    span.style.fontWeight = "400";
+    try { span.appendChild(range.extractContents()); range.insertNode(span); } catch (e) {}
+    this.rtCommit();
+  }
+  rtClear() {
+    try { document.execCommand("removeFormat"); } catch (e) {}
+    const host = this.rtHost();
+    if (host) host.querySelectorAll("span.em").forEach((s) => s.replaceWith(...s.childNodes));
+    this.rtCommit();
+  }
+  /* Toolbar clicks land outside the editor, so the last in-editor selection is
+     remembered and restored before any command runs. */
+  rtRemember = () => {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const n = sel.anchorNode;
+    const el = n && (n.nodeType === 1 ? n : n.parentElement);
+    if (el && el.closest && el.closest(".rt")) this.savedRange = sel.getRangeAt(0).cloneRange();
+  };
+  rtRestore() {
+    if (this.rtHost()) return true;
+    if (!this.savedRange) return false;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(this.savedRange);
+    const host = this.rtHost();
+    if (host) host.focus();
+    return !!host;
+  }
+  /* Build a field's editor bindings: load once, save on every keystroke. */
+  rtBind(getValue, save) {
+    return {
+      rtRef: (el) => {
+        if (!el) return;
+        el._save = save;
+        const want = getValue();
+        if (el._loaded !== want && document.activeElement !== el) {
+          el.innerHTML = want || "";
+          el._loaded = want;
+        }
+      },
+      rtInput: (e) => { const v = e.target.innerHTML; e.target._loaded = v; save(v); this.flash("Saved"); }
+    };
+  }
+
+  rtHost() {
+    const n = window.getSelection && window.getSelection().anchorNode;
+    if (!n) return null;
+    const el = n.nodeType === 1 ? n : n.parentElement;
+    return el && el.closest ? el.closest(".rt") : null;
+  }
+  /* Push the edited HTML back into the draft store. */
+  rtCommit() {
+    const host = this.rtHost();
+    if (!host || !host._save) return;
+    host._save(host.innerHTML);
+    this.flash("Saved");
   }
 
   flash(msg) {
@@ -481,7 +701,10 @@ class Component extends DCLogic {
           const v = window.CMS.lookup(f.key, ns);
           return v === undefined ? (defs[f.key] || "") : v;
         })(),
-        onInput: (e) => { window.CMS.setText(window.CMS.nsKey(f.key, ns), e.target.value); this.flash("Saved"); },
+        ...this.rtBind(
+          () => { const v = window.CMS.lookup(f.key, ns); return v === undefined ? (window.CMS.defaults()[f.key] || "") : v; },
+          (v) => window.CMS.setText(window.CMS.nsKey(f.key, ns), v)
+        ),
         reset: () => { window.CMS.setText(window.CMS.nsKey(f.key, ns), null); this.flash("Reverted"); }
       });
     });
@@ -516,7 +739,7 @@ class Component extends DCLogic {
       text: true, media: false,
       label, rows: rows || 2,
       value: String(get(path) || ""),
-      onInput: (e) => { window.CMS.setDetail(id, path, e.target.value); this.flash("Saved"); },
+      ...this.rtBind(() => String(get(path) || ""), (v) => window.CMS.setDetail(id, path, v)),
       reset: () => { window.CMS.setDetail(id, path, null); this.flash("Reverted"); }
     });
 
@@ -537,6 +760,9 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    /* Idempotent, and re-asserted here so a hot reload can't drop the panel
+       back into writing straight to the published copy. */
+    if (window.CMS) window.CMS.enterDraftMode();
     const page = this.state.page;
     const editing = this.state.editing;
     const defs = window.CMS ? window.CMS.defaults() : {};
@@ -561,17 +787,40 @@ class Component extends DCLogic {
       : (fmt && fmt.kind === "data") ? this.dataGroups(entry.id) : [];
 
     const titles = {
-      content: ["Home page", "Copy edits apply to the live site instantly."],
-      work: ["Work", "Three sections, each with its own page format."],
+      content: ["Home page", "Edits are saved as a draft. Nothing changes on the live site until you press Publish."],
+      work: ["Work", "Three sections, each with its own page format. Edits stay in draft until you press Publish."],
       stats: ["Analytics", "Visits, dwell time and engagement collected on this device."]
     };
 
     return {
       pageTitle: entry ? entry.title : titles[page][0],
       pageSub: entry ? (SECTION_NAME[(entry.groups || ["live"])[0]] + " · " + (entry.tag || "")) : titles[page][1],
+      rtHold: (e) => e.preventDefault(),
+      rtBold: () => { this.rtRestore() && this.rtExec("bold"); },
+      rtItalic: () => { this.rtRestore() && this.rtExec("italic"); },
+      rtUnderline: () => { this.rtRestore() && this.rtExec("underline"); },
+      rtStrike: () => { this.rtRestore() && this.rtExec("strikeThrough"); },
+      rtWhite: () => { this.rtRestore() && this.rtStyle("color", "#ffffff"); },
+      rtBlue: () => { this.rtRestore() && this.rtStyle("color", "var(--color-accent)"); },
+      rtGrey: () => { this.rtRestore() && this.rtStyle("color", "var(--body-copy)"); },
+      rtMuted: () => { this.rtRestore() && this.rtStyle("color", "var(--color-neutral-600)"); },
+      rtFont: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (!v || !this.rtRestore()) return;
+        if (v === "accent") this.rtAccentFont();
+        else this.rtStyle("fontFamily", v === "heading" ? "var(--font-heading)" : "var(--font-body)");
+      },
+      rtWeight: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (v && this.rtRestore()) this.rtStyle("fontWeight", v);
+      },
+      rtClearFmt: () => { this.rtRestore() && this.rtClear(); },
+
       savedLabel: this.state.saved || (R.available ? (this.dirty() ? "Unpublished changes" : "Published") : "Local"),
       onServer: R.available,
-      canUpload: R.available && R.admin,
+      canUpload: true,
       needsLogin: R.available && !R.admin,
       loginError: !!this.state.loginErr,
       loginErrorText: this.state.loginErr || "",
@@ -584,12 +833,21 @@ class Component extends DCLogic {
         });
       },
       doLogout: () => window.CMS.logout(),
-      publishLabel: R.saving ? "Publishing…" : (R.error ? R.error : (this.dirty() ? "Publish changes" : "Published")),
+      publishLabel: R.saving ? "Publishing…" : (R.error ? R.error : (this.dirty() ? "Publish changes" : "Nothing to publish")),
       publishStyle: "padding: 9px 17px; border-radius: 999px; border: 0; font-size: 13px; font-weight: 600; cursor: pointer; "
         + (this.dirty() && !R.saving
           ? "background: var(--accent); color: #08111f;"
           : "background: #182034; color: #6b7080;"),
-      doPublish: () => window.CMS.publish().then((ok) => this.flash(ok ? "Published" : "Publish failed")),
+      doPublish: () => window.CMS.publish().then((ok) => this.flash(ok ? "Published — live now" : "Publish failed")),
+      doDiscard: () => {
+        if (!confirm("Throw away every edit made since the last publish?")) return;
+        window.CMS.discardDraft();
+        this.flash("Back to published");
+      },
+      doRestore: () => {
+        if (!confirm("Roll the live site back to the version published before the last one?")) return;
+        window.CMS.restoreLastPublish().then((ok) => this.flash(ok ? "Rolled back" : "Nothing to roll back"));
+      },
 
       needsSite: !Object.keys(defs).length && page !== "stats",
       isContent: page === "content",
@@ -611,11 +869,10 @@ class Component extends DCLogic {
         rows: f.type === "area" || f.type === "rich" ? 3 : 2,
         disabled: !Object.keys(defs).length,
         value: Object.prototype.hasOwnProperty.call(over, f.key) ? over[f.key] : (defs[f.key] || ""),
-        onInput: (e) => {
-          if (!Object.keys(defs).length) return;
-          window.CMS.setText(f.key, e.target.value);
-          this.flash("Saved");
-        },
+        ...this.rtBind(
+          () => (Object.prototype.hasOwnProperty.call(window.CMS.text(), f.key) ? window.CMS.text()[f.key] : (window.CMS.defaults()[f.key] || "")),
+          (v) => { if (Object.keys(window.CMS.defaults()).length) window.CMS.setText(f.key, v); }
+        ),
         reset: () => { window.CMS.setText(f.key, null); this.flash("Reverted"); }
       })),
       resetAllText: () => { window.CMS.resetText(); this.flash("Reverted all"); },
@@ -665,7 +922,9 @@ class Component extends DCLogic {
         setTitle: (ev) => this.patch(entry.id, "title", ev.target.value),
         setTag: (ev) => this.patch(entry.id, "tag", ev.target.value),
         setPlatform: (ev) => this.patch(entry.id, "platform", ev.target.value),
-        setBody: (ev) => this.patch(entry.id, "body", ev.target.value),
+        ...(() => { const b = this.rtBind(() => entry.body || "", (v) => this.patch(entry.id, "body", v));
+          return { bodyRef: b.rtRef, bodyInput: b.rtInput }; })(),
+        uploadImg: () => this.pickFile((src) => this.patch(entry.id, "img", src)),
         setImg: (ev) => this.patch(entry.id, "img", ev.target.value),
         setGroup: (ev) => this.patch(entry.id, "groups", [ev.target.value]),
         layout: lk || "",

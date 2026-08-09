@@ -94,6 +94,14 @@
     background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0));
     filter: blur(.5px);
   }
+  /* Craft grid holds 3 x 2 everywhere down to tablet landscape; only
+     tablet portrait and phones are allowed to reflow. */
+  @media (max-width: 1024px) and (orientation: portrait) {
+    .craft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  }
+  @media (max-width: 600px) {
+    .craft-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  }
   @media (max-width: 600px) {
     .about-photo { display: none !important; }
     .tools { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; justify-items: center; gap: 14px !important; width: 100% !important; }
@@ -529,7 +537,7 @@
         </section>
 
         <div style="margin-top: clamp(34px, 5vw, 60px); padding: clamp(24px, 3.4vw, 40px); border-radius: var(--radius-lg); border: 1px solid var(--edge); background: var(--ink); text-align: center;">
-          <img src="assets/icon-lock.svg" alt="Lock Icon" style="width: 56px; height: 56px; opacity: .75; margin: 0 auto 16px;" data-cms-media="bu.m22">
+          <img src="uploads/wired-lineal-926-road-barrier-hover-pinch.gif" alt="Lock Icon" style="width: 56px; height: 56px; opacity: .75; margin: 0 auto 16px;" data-cms-media="bu.m22">
           <h3 style="margin: 0 0 12px; font-size: clamp(18px, 2.2vw, 24px); font-weight: 500; letter-spacing: -.02em;" data-cms="bu.95">This is the end...</h3>
           <p style="margin: 0 auto 22px; font-size: 15px; line-height: 1.7; color: var(--body-copy);" data-cms="bu.96">See a little more? click the first button. Wanna know really really more, click the second one.</p>
           <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
@@ -661,7 +669,7 @@
         </sc-if>
 
         <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: var(--radius-lg); padding: clamp(26px, 4vw, 46px); text-align: center;">
-          <img src="assets/icon-lock.svg" alt="" style="width: 52px; height: 52px; opacity: .75; margin: 0 auto 16px;">
+          <img src="uploads/wired-lineal-926-road-barrier-hover-pinch.gif" alt="" style="width: 52px; height: 52px; opacity: .75; margin: 0 auto 16px;">
           <h3 style="margin: 0 0 12px; font-size: clamp(17px, 2vw, 21px); font-weight: 500; letter-spacing: -.02em;">And that's all I can reveal here!</h3>
           <p style="margin: 0 auto 22px; font-size: 14.5px; line-height: 1.7; color: var(--body-copy); max-width: 52ch; text-wrap: pretty;">The full story is locked away under NDA. Want to know more? Let's connect and I'll share what I can behind the scenes!</p>
           <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
@@ -886,7 +894,7 @@
       <p style="margin: 0 0 16px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-neutral-600);" data-cms="craft.eyebrow">What I bring to the table</p>
       <h2 style="margin: 0; font-size: clamp(21px, 3.3vw, 42px); line-height: 1.1; letter-spacing: -.03em; font-weight: 500; white-space: nowrap;" data-cms="craft.title">Six things I'm <span class="em" style="color: var(--color-accent);">reliably</span> good at.</h2>
     </div>
-    <div data-reveal="" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(12px, 1.4vw, 18px);">
+    <div class="craft-grid" data-reveal="" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 18px); margin: 0 auto;">
       <sc-for list="{{ craft }}" as="c" hint-placeholder-count="6">
         <div style="border: 1px solid var(--edge); border-radius: var(--radius-lg); background: var(--ink); padding: clamp(22px, 2.6vw, 30px); display: flex; flex-direction: column; gap: 11px; transition: border-color .3s, transform .4s cubic-bezier(.2,.7,.2,1);" style-hover="border-color: color-mix(in srgb, var(--color-neutral-300) 26%, transparent); transform: translateY(-3px);">
           <span style="font-size: 12px; color: var(--color-accent);">{{ c.num }}</span>
