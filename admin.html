@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-e6e5a964-478d-4f51-ac86-b0fb09ee6146/styles.css">
+<script src="./cms.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=Inter:wght@400;500&amp;display=swap">
+<style>
+  /* The editor must preview the SITE's tokens, not the design system's defaults —
+     otherwise the swatch you click is not the colour that ships. Mirrors the
+     :root block in Akash Portfolio.dc.html. */
+  :root {
+    --ink: #0b0e15; --edge: rgba(255,255,255,.09); --body-copy: #C2C2C2; --accent: #6EA3FF;
+    --color-accent: #6EA3FF;
+    --color-accent-100: #f0f6ff;
+    --color-accent-200: #dbe9ff;
+    --color-accent-300: #b9d3ff;
+    --color-accent-400: #93bbff;
+    --color-accent-500: #6EA3FF;
+    --color-accent-600: #4d83db;
+    --color-accent-700: #3a63a8;
+    --color-accent-800: #294574;
+    --color-accent-900: #1b2c49;
+    --font-heading: "Instrument Sans", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+  }
+  body { margin: 0; background: #05070c; color: #e9eaee; font-family: "Instrument Sans", sans-serif; }
+  h1, h2, h3 { font-family: "Instrument Sans", sans-serif; }
+  input, textarea, select, button { font-family: inherit; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent) !important; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: #9dc0ff; }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: #23283a; border-radius: 8px; }
+  @media (max-width: 860px) { .shell { grid-template-columns: 1fr !important; } .side { position: static !important; height: auto !important; flex-direction: row !important; overflow-x: auto; } }
+
+  /* --- rich text field --- */
+  .rt-wrap { border: 1px solid var(--edge); border-radius: 10px; background: #0e121b; overflow: hidden; }
+  .rt-wrap:focus-within { border-color: var(--accent); }
+  .rt-bar { display: none; flex-wrap: wrap; align-items: center; gap: 3px; padding: 6px 7px;
+    background: #121722; border-bottom: 1px solid var(--edge); }
+  .rt-wrap:focus-within .rt-bar, .rt-wrap:hover .rt-bar { display: flex; }
+  .rt-bar button, .rt-bar select {
+    height: 27px; min-width: 27px; padding: 0 7px; border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent; background: transparent; color: #c3c8d4; font-size: 12.5px; line-height: 1;
+  }
+  .rt-bar button:hover, .rt-bar select:hover { background: #1c2331; color: #fff; }
+  .rt-bar select { border-color: var(--edge); background: #0e121b; padding-right: 4px; }
+  .rt-bar .sep { width: 1px; height: 18px; background: var(--edge); margin: 0 4px; }
+  .rt-sw { width: 20px; height: 20px; min-width: 20px; padding: 0; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.22); cursor: pointer; }
+  .rt-sw:hover { transform: scale(1.12); }
+  .rt {
+    min-height: 44px; padding: 11px 13px; font-size: 14px; line-height: 1.65; color: #e9eaee;
+    outline: none; white-space: pre-wrap; word-break: break-word;
+  }
+  .rt:empty::before { content: attr(data-ph); color: #4d5464; }
+  /* Mirror the site's own accent type so what you style is what you get. */
+  .rt .em { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; }
+</style>
+</helmet>
+
+<div class="shell" style="display: grid; grid-template-columns: 232px 1fr; min-height: 100vh;">
+
+  <aside class="side" style="position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 4px; padding: 22px 14px; background: #080b12; border-right: 1px solid var(--edge);">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 0 8px 20px;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
+      <span style="font-size: 14px; font-weight: 600; letter-spacing: -.01em;">Studio</span>
+    </div>
+    <button type="button" onClick="{{ goContent }}" style="{{ navContent }}">Home page</button>
+    <button type="button" onClick="{{ goWork }}" style="{{ navWork }}">Work</button>
+    <button type="button" onClick="{{ goStats }}" style="{{ navStats }}">Analytics</button>
+    <div style="flex: 1;"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <button type="button" onClick="{{ doDiscard }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid var(--edge); background: transparent; color: #8b90a0; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Discard unpublished edits</button>
+      <button type="button" onClick="{{ doRestore }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,150,120,.28); background: transparent; color: #ffb59a; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #ffb59a;">Undo last publish</button>
+      <a href="index.html" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
+      <sc-if value="{{ onServer }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ doLogout }}" style="padding: 9px 12px; border-radius: 10px; border: 0; background: transparent; color: #5f6472; font-size: 12px; text-align: left; cursor: pointer;" style-hover="color: #fff;">Sign out</button>
+      </sc-if>
+    </div>
+  </aside>
+
+  <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; background: #05070c;">
+      <form onSubmit="{{ doLogin }}" style="width: 100%; max-width: 340px; border: 1px solid var(--edge); background: var(--ink); border-radius: 18px; padding: 26px;">
+        <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 18px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
+          <span style="font-size: 14px; font-weight: 600;">Studio</span>
+        </div>
+        <label style="display: block; font-size: 12px; color: #7d8394; margin-bottom: 7px;">Password</label>
+        <input type="password" onInput="{{ setPw }}" autofocus="true" style="width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 14px;">
+        <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 10px 0 0; font-size: 12.5px; color: #ff9a9a;">{{ loginErrorText }}</p>
+        </sc-if>
+        <button type="submit" style="width: 100%; margin-top: 16px; padding: 12px; border-radius: 999px; border: 0; background: var(--accent); color: #08111f; font-size: 14px; font-weight: 600; cursor: pointer;">Sign in</button>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCommit }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 210; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(3,5,10,.82);">
+      <div style="width: 100%; max-width: 460px; border: 1px solid var(--edge); background: var(--ink); border-radius: 18px; padding: 26px;">
+        <h2 style="margin: 0 0 10px; font-size: 18px; font-weight: 600;">One step left</h2>
+        <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.65; color: var(--body-copy);">GitHub Pages can't save files, so your edits came down as <strong style="color: #fff;">content.json</strong>. Commit that file to publish them.</p>
+        <ol style="margin: 0 0 20px; padding-left: 18px; display: flex; flex-direction: column; gap: 9px; font-size: 13.5px; line-height: 1.6; color: var(--body-copy);">
+          <li>Open your repository on GitHub.</li>
+          <li>Drag <strong style="color: #fff;">content.json</strong> into the folder holding <strong style="color: #fff;">index.html</strong> — replacing the old one.</li>
+          <li>Commit. The site updates in about a minute.</li>
+        </ol>
+        <button type="button" onClick="{{ closeCommit }}" style="width: 100%; padding: 12px; border-radius: 999px; border: 0; background: var(--accent); color: #08111f; font-size: 14px; font-weight: 600; cursor: pointer;">Got it</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <main style="min-width: 0; padding: clamp(22px, 3.4vw, 46px) clamp(18px, 3.4vw, 44px) 90px;">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 26px;">
+      <div style="min-width: 0;">
+        <sc-if value="{{ inEditor }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ closeEditor }}" style="margin-bottom: 12px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #9aa0b0; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">← All work</button>
+        </sc-if>
+        <h1 style="margin: 0 0 6px; font-size: clamp(22px, 2.6vw, 30px); font-weight: 500; letter-spacing: -.03em;">{{ pageTitle }}</h1>
+        <p style="margin: 0; font-size: 13.5px; color: #8b90a0;">{{ pageSub }}</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <button type="button" onClick="{{ doExport }}" style="padding: 9px 15px; border-radius: 999px; border: 1px solid var(--edge); background: var(--ink); color: var(--body-copy); font-size: 13px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Export JSON</button>
+        <button type="button" onClick="{{ doPublish }}" style="{{ publishStyle }}">{{ publishLabel }}</button>
+        <span style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px; border: 1px solid rgba(110,163,255,.35); background: rgba(110,163,255,.08); font-size: 13px; color: var(--accent);">{{ savedLabel }}</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ needsSite }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 16px; padding: 15px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
+        <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">Open the portfolio once so the panel can read its current copy — until then text fields have nothing to load.</p>
+        <a href="index.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isContent }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 880px;">
+        <sc-for list="{{ fields }}" as="f" hint-placeholder-count="6">
+          <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 14px; padding: 16px 18px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <span style="font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #6b7080;">{{ f.group }}</span>
+                <span style="font-size: 13.5px; color: #d6d8de;">{{ f.label }}</span>
+              </div>
+              <button type="button" onClick="{{ f.reset }}" style="flex: none; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #7d8394; font-size: 11.5px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Revert</button>
+            </div>
+            <div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+  </div>
+            <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 8px 0 0; font-size: 11.5px; color: #6b7080;">{{ f.hint }}</p>
+            </sc-if>
+          </div>
+        </sc-for>
+        <button type="button" onClick="{{ resetAllText }}" style="align-self: start; margin-top: 6px; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255,120,120,.3); background: transparent; color: #ff9a9a; font-size: 13px; cursor: pointer;" style-hover="border-color: #ff9a9a;">Revert all copy to defaults</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isWorkList }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 26px; max-width: 1000px;">
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+          <section>
+            <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <h2 style="margin: 0 0 5px; font-size: 16px; font-weight: 500; letter-spacing: -.015em;">{{ sec.title }}</h2>
+                <p style="margin: 0; font-size: 12.5px; color: #6b7080;">{{ sec.note }}</p>
+              </div>
+              <button type="button" onClick="{{ sec.add }}" style="flex: none; padding: 8px 15px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: var(--accent); font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent);">+ Add entry</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ sec.items }}" as="c" hint-placeholder-count="2">
+                <div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--edge); background: var(--ink); border-radius: 14px; transition: border-color .2s;" style-hover="border-color: rgba(110,163,255,.4);">
+                  <div style="flex: none; width: 62px; height: 44px; border-radius: 8px; background: #131824 center/cover no-repeat; background-image: {{ c.thumbCss }};"></div>
+                  <button type="button" onClick="{{ c.edit }}" style="flex: 1; min-width: 0; text-align: left; background: transparent; border: 0; cursor: pointer; color: inherit; padding: 0;">
+                    <span style="display: block; font-size: 14.5px; font-weight: 500; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.title }}</span>
+                    <span style="display: block; font-size: 12px; color: #7d8394; margin-top: 3px;">{{ c.meta }}</span>
+                  </button>
+                  <div style="flex: none; display: flex; gap: 6px;">
+                    <button type="button" onClick="{{ c.up }}" title="Move up" style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #9aa0b0; cursor: pointer;">↑</button>
+                    <button type="button" onClick="{{ c.down }}" title="Move down" style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #9aa0b0; cursor: pointer;">↓</button>
+                    <button type="button" onClick="{{ c.edit }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #d6d8de; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">Edit</button>
+                    <button type="button" onClick="{{ c.dup }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #d6d8de; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">Duplicate</button>
+                    <button type="button" onClick="{{ c.remove }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,120,120,.28); background: transparent; color: #ff9a9a; font-size: 12.5px; cursor: pointer;">Delete</button>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; padding: 16px; border: 1px dashed var(--edge); border-radius: 14px; font-size: 12.5px; color: #6b7080;">Nothing in this section yet.</p>
+              </sc-if>
+            </div>
+          </section>
+        </sc-for>
+        <button type="button" onClick="{{ resetCases }}" style="align-self: start; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255,120,120,.3); background: transparent; color: #ff9a9a; font-size: 13px; cursor: pointer;">Restore original list</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ inEditor }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 900px;">
+
+        <div style="display: inline-flex; align-self: start; gap: 4px; padding: 5px; border-radius: 999px; border: 1px solid var(--edge); background: var(--ink);">
+          <button type="button" onClick="{{ tabCard }}" style="{{ tabCardStyle }}">Card</button>
+          <button type="button" onClick="{{ tabPage }}" style="{{ tabPageStyle }}">Case study page</button>
+        </div>
+
+        <sc-if value="{{ onCard }}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; padding: 18px; border: 1px solid var(--edge); background: var(--ink); border-radius: 16px;">
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Title</span><input onInput="{{ e.setTitle }}" value="{{ e.title }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Tag</span><input onInput="{{ e.setTag }}" value="{{ e.tag }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Platform</span><input onInput="{{ e.setPlatform }}" value="{{ e.platform }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Section</span>
+              <select onChange="{{ e.setGroup }}" value="{{ e.group }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;">
+                <option value="cases">Case Studies</option>
+                <option value="live">Live Projects</option>
+                <option value="labs">Experiments &amp; MVPs</option>
+              </select>
+            </label>
+            <sc-if value="{{ canPickLayout }}" hint-placeholder-val="{{ false }}">
+              <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Page layout</span>
+                <select onChange="{{ e.setLayout }}" value="{{ e.layout }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;">
+                  <option value="">Card only — no detail page</option>
+                  <option value="longform">Long-form case study</option>
+                  <option value="mvp">MVP / experiment</option>
+                </select>
+              </label>
+            </sc-if>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card thumbnail — shown on the work list</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <input onInput="{{ e.setImg }}" value="{{ e.img }}" placeholder="uploads/cover.jpg" style="flex: 1; min-width: 200px; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 13.5px;">
+                <button type="button" onClick="{{ e.uploadImg }}" style="flex: none; padding: 10px 16px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo</button>
+              </div></label>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #7d8394; margin-bottom: 6px;">Card description</span><div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="One or two lines about this project…" ref="{{ e.bodyRef }}" onInput="{{ e.bodyInput }}"></div>
+  </div></label>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ onPage }}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #6b7080;">{{ formatNote }}</p>
+
+          <sc-for list="{{ pageGroups }}" as="g" hint-placeholder-count="3">
+            <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; overflow: hidden;">
+              <div style="padding: 13px 18px; border-bottom: 1px solid var(--edge); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #7d8394;">{{ g.title }}</div>
+              <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px 18px;">
+                <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="3">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px;">
+                      <span style="font-size: 12px; color: #9aa0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ f.label }}</span>
+                      <button type="button" onClick="{{ f.reset }}" style="flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #7d8394; font-size: 11px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Revert</button>
+                    </div>
+                    <sc-if value="{{ f.media }}" hint-placeholder-val="{{ false }}">
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 10px; border: 1px dashed var(--edge); background: #0c1017;">
+                        <sc-if value="{{ f.noSelect }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex: none; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #9aa0b0; font-size: 12.5px;">{{ f.typeLabel }}</span>
+                        </sc-if>
+                        <sc-if value="{{ f.hasSelect }}" hint-placeholder-val="{{ true }}">
+                          <select onChange="{{ f.setType }}" value="{{ f.type }}" style="flex: none; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 12.5px;">
+                            <option value="image">Photo</option>
+                            <option value="video">Video</option>
+                          </select>
+                        </sc-if>
+                        <input onInput="{{ f.onInput }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" style="flex: 1; min-width: 180px; box-sizing: border-box; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e121b; color: #e9eaee; font-size: 12.5px;">
+                        <sc-if value="{{ canUpload }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo / video</button>
+                        </sc-if>
+                        <sc-if value="{{ f.isVideo }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex: none; padding: 4px 9px; border-radius: 999px; background: rgba(110,163,255,.14); color: #cfe0ff; font-size: 11px;">autoplay · loop · muted</span>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ f.text }}" hint-placeholder-val="{{ true }}">
+                      <div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Instrument Sans</option>
+        <option value="body">Inter</option>
+        <option value="accent">Instrument Serif · accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #6EA3FF;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #C2C2C2;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+  </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ needsReload }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
+              <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">This page's fields load from the site itself. Open the portfolio once (or reload it if it's already open), then come back.</p>
+              <a href="index.html" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noPageFields }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; padding: 18px; border: 1px dashed var(--edge); border-radius: 14px; font-size: 13px; line-height: 1.6; color: #8b90a0;">This entry has no case-study page built yet — only its card shows on the site. The card fields above are all that's editable.</p>
+          </sc-if>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isStats }}" hint-placeholder-val="{{ false }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 14px; padding: 18px;">
+            <div style="font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #6b7080;">{{ k.label }}</div>
+            <div style="margin-top: 10px; font-size: 27px; font-weight: 500; letter-spacing: -.03em; color: {{ k.color }};">{{ k.value }}</div>
+            <div style="margin-top: 5px; font-size: 12px; color: #7d8394;">{{ k.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; padding: 18px 20px; margin-bottom: 16px;">
+        <div style="font-size: 13px; color: #d6d8de; margin-bottom: 16px;">Visits — last 14 days</div>
+        <div style="display: flex; align-items: flex-end; gap: 6px; height: 130px;">
+          <sc-for list="{{ series }}" as="d" hint-placeholder-count="14">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 0;">
+              <div title="{{ d.n }}" style="width: 100%; border-radius: 5px 5px 2px 2px; background: {{ d.fill }}; height: {{ d.h }};"></div>
+              <span style="font-size: 10.5px; color: #6b7080;">{{ d.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; padding: 18px 20px;">
+          <div style="font-size: 13px; color: #d6d8de; margin-bottom: 14px;">Time spent per page</div>
+          <sc-for list="{{ dwell }}" as="d" hint-placeholder-count="3">
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #a8adbb; margin-bottom: 6px;"><span>{{ d.name }}</span><span style="color: #e9eaee;">{{ d.time }}</span></div>
+              <div style="height: 6px; border-radius: 99px; background: #171c28; overflow: hidden;"><div style="height: 100%; border-radius: 99px; background: var(--accent); width: {{ d.pct }};"></div></div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noDwell }}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 12.5px; color: #6b7080;">No sessions recorded yet.</p></sc-if>
+        </div>
+        <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; padding: 18px 20px;">
+          <div style="font-size: 13px; color: #d6d8de; margin-bottom: 14px;">Most opened case studies</div>
+          <sc-for list="{{ topCases }}" as="d" hint-placeholder-count="3">
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #a8adbb; margin-bottom: 6px;"><span>{{ d.name }}</span><span style="color: #e9eaee;">{{ d.n }}</span></div>
+              <div style="height: 6px; border-radius: 99px; background: #171c28; overflow: hidden;"><div style="height: 100%; border-radius: 99px; background: #27C291; width: {{ d.pct }};"></div></div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noCases }}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 12.5px; color: #6b7080;">No case studies opened yet.</p></sc-if>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; padding: 18px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px;">
+          <span style="font-size: 13px; color: #d6d8de;">Recent activity</span>
+          <button type="button" onClick="{{ clearStats }}" style="padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(255,120,120,.28); background: transparent; color: #ff9a9a; font-size: 12px; cursor: pointer;">Clear data</button>
+        </div>
+        <sc-for list="{{ recent }}" as="e" hint-placeholder-count="8">
+          <div style="display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.05); font-size: 12.5px;">
+            <span style="flex: none; width: 92px; color: #6b7080;">{{ e.time }}</span>
+            <span style="flex: none; padding: 2px 9px; border-radius: 999px; background: #141a26; color: #9aa0b0; font-size: 11px;">{{ e.type }}</span>
+            <span style="color: #c9ccd6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ e.label }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noEvents }}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 12.5px; color: #6b7080;">Nothing tracked yet — open the site in another tab and browse.</p></sc-if>
+      </div>
+
+      <p style="margin: 16px 0 0; font-size: 12px; line-height: 1.65; color: #5f6472; max-width: 78ch;">{{ statsNote }}</p>
+    </sc-if>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+const SECTION_META = [
+  { key: "cases", title: "1 · Case Studies", note: "Long-form format — narrative sections, quote, impact stats." },
+  { key: "live", title: "2 · Live Projects", note: "Product format — stat headline, fact rail, impact cards, NDA close." },
+  { key: "labs", title: "3 · Experiments & MVPs", note: "MVP format — research steps, screen grid, features, learnings." }
+];
+const SECTION_NAME = { cases: "Case Studies", live: "Live Projects", labs: "Experiments & MVPs" };
+
+/* Page layouts and how each one's fields are sourced. */
+const LAYOUT = {
+  longform: { kind: "prefix", prefix: "ws", label: "Long-form case study", note: "Long-form case-study layout. Fields are in page order, top to bottom." },
+  mvp: { kind: "prefix", prefix: "bu", label: "MVP / experiment", note: "MVP layout. Fields are in page order, top to bottom." },
+  product: { kind: "data", label: "Live product", note: "Product layout — structured fields map to the page's blocks." }
+};
+const NATIVE_FORMAT = { workspace: "longform", buseit: "mvp", kriyam: "product", proteger: "product", goodbook: "product" };
+function layoutKey(entry) {
+  if (!entry) return null;
+  return entry.format || NATIVE_FORMAT[entry.source || entry.id] || null;
+}
+
+/* Structured schema for the data-driven product format. */
+const DATA_SCHEMA = [
+  { title: "Header", fields: [
+    { path: "statLead", label: "Stat (accent)", rows: 1 },
+    { path: "statRest", label: "Headline remainder", rows: 2 },
+    { path: "lede", label: "Standfirst", rows: 3 },
+    { path: "heroSrc", label: "Hero media", rows: 1, hint: "Photo or video path — .mp4 plays as video" }
+  ] },
+  { title: "Fact rail", repeat: "facts", of: [
+    { path: "k", label: "Label", rows: 1 },
+    { path: "v", label: "Value", rows: 2 }
+  ] },
+  { title: "Impact cards", repeat: "impact", of: [
+    { path: "h", label: "Heading", rows: 1 },
+    { path: "p", label: "Body", rows: 3 },
+    { path: "src", label: "Card media", rows: 1 }
+  ] },
+  { title: "Outcome", fields: [{ path: "outcomeSrc", label: "Outcome media", rows: 1 }] },
+  { title: "Project overview", repeat: "overview", scalar: true, label: "Paragraph", rows: 4 },
+  { title: "Role & team", repeat: "role", scalar: true, label: "Paragraph", rows: 4 },
+  { title: "Close", fields: [{ path: "clientsLabel", label: "Clients heading", rows: 1 }] }
+];
+
+const SEED = [
+  { id: "workspace", title: "WorkSpace", tag: "Kriyam — Field Service", platform: "Product Design", img: "uploads/Case%20cover.jpg", groups: ["cases"], body: "Letting every client run cases their own way — reshaping the app around how teams already work, instead of teaching them ours." },
+  { id: "kriyam", title: "Built for trust. Designed for scale.", tag: "BFSI", platform: "Web & Mobile", img: "uploads/Kriyam%20Mockup.jpg", groups: ["live"], body: "Kriyam.ai brings order to insurance's most vulnerable touchpoint — field verification." },
+  { id: "proteger", title: "Building tomorrow's smart factories", tag: "Manufacturing", platform: "Web, Tablet & Mobile", img: "uploads/391985742_854c309b-66af-4b9a-a203-12cf7fae41dc%202.jpg", groups: ["live"], body: "End-to-end operational intelligence for manufacturers." },
+  { id: "goodbook", title: "Attendance, payroll and HR — beautifully simple", tag: "Enterprise HR", platform: "Web & Mobile", img: "uploads/138817034_9b8cfbdd-ec88-42cb-af03-f4cdb9f0cff3.jpg", groups: ["live"], body: "From check-in to payslip in one place." },
+  { id: "buseit", title: "Buy it. Use it. Sell it.", tag: "C2C Marketplace", platform: "iOS & Android", img: "uploads/b2.png", groups: ["labs"], body: "A trust-first resale marketplace." }
+];
+
+function fmtTime(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return s + "s";
+  const m = Math.floor(s / 60);
+  return m < 60 ? m + "m " + (s % 60) + "s" : Math.floor(m / 60) + "h " + (m % 60) + "m";
+}
+
+class Component extends DCLogic {
+  state = { page: "content", editing: null, editTab: "card", saved: "", tick: 0 };
+
+  componentDidMount() {
+    /* The panel always edits the draft copy, never what visitors are served. */
+    if (window.CMS) window.CMS.enterDraftMode();
+    document.addEventListener("selectionchange", this.rtRemember);
+    this.off = window.CMS && window.CMS.onChange(() => this.setState((s) => ({ tick: s.tick + 1 })));
+    this.timer = setInterval(() => {
+      if (this.state.page !== "stats") return;
+      this.pullStats();
+      this.setState((s) => ({ tick: s.tick + 1 }));
+    }, 6000);
+    if (window.CMS && !(window.CMS.projects() || []).length) window.CMS.saveProjects(SEED.map((p) => ({ ...p })));
+    /* Pull every editable field out of the site's source so no page visit is needed. */
+    if (window.CMS) window.CMS.harvestFromSource("Akash Portfolio.dc.html").then(() => this.setState((s) => ({ tick: s.tick + 1 })));
+  }
+  componentWillUnmount() {
+    if (this.off) this.off();
+    clearInterval(this.timer);
+    document.removeEventListener("selectionchange", this.rtRemember);
+  }
+
+  /* Opens the OS file picker, sends the file to the server, hands back its path. */
+  pickFile(done) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*,video/mp4,video/webm,video/quicktime";
+    input.onchange = () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      this.flash("Uploading…");
+      window.CMS.upload(file).then((path) => {
+        if (!path) { this.flash("Upload failed"); return; }
+        done(path);
+        /* A data: URL means there was no server to write /uploads on. */
+        this.flash(/^data:/.test(path) ? "Added (local preview)" : "Uploaded to /uploads");
+      });
+    };
+    input.click();
+  }
+
+  pullStats() {
+    const R = window.CMS && window.CMS.remote;
+    if (!R || !R.available || !R.admin) return;
+    window.CMS.remoteStats().then((s) => { if (s) this.setState({ serverStats: s }); });
+  }
+
+  dirty() {
+    try { return !!localStorage.getItem("akash.cms.dirty"); } catch (e) { return false; }
+  }
+
+  /* --- rich text -------------------------------------------------------
+     A contenteditable per field. The toolbar acts on the live selection, so
+     buttons must never take focus (mousedown is prevented in the template). */
+  rtExec(cmd, val) {
+    try { document.execCommand("styleWithCSS", false, true); } catch (e) {}
+    document.execCommand(cmd, false, val || null);
+    this.rtCommit();
+  }
+  /* Wrap the selection in a span carrying one CSS property. */
+  rtStyle(prop, value) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.style[prop] = value;
+    try {
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      sel.removeAllRanges();
+      const r = document.createRange();
+      r.selectNodeContents(span);
+      sel.addRange(r);
+    } catch (e) {}
+    this.rtCommit();
+  }
+  /* The serif accent used across the site, applied as one action. */
+  rtAccentFont() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.className = "em";
+    span.style.fontFamily = '"Instrument Serif", Georgia, serif';
+    span.style.fontStyle = "italic";
+    span.style.fontWeight = "400";
+    try { span.appendChild(range.extractContents()); range.insertNode(span); } catch (e) {}
+    this.rtCommit();
+  }
+  rtClear() {
+    try { document.execCommand("removeFormat"); } catch (e) {}
+    const host = this.rtHost();
+    if (host) host.querySelectorAll("span.em").forEach((s) => s.replaceWith(...s.childNodes));
+    this.rtCommit();
+  }
+  /* Toolbar clicks land outside the editor, so the last in-editor selection is
+     remembered and restored before any command runs. */
+  rtRemember = () => {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const n = sel.anchorNode;
+    const el = n && (n.nodeType === 1 ? n : n.parentElement);
+    if (el && el.closest && el.closest(".rt")) this.savedRange = sel.getRangeAt(0).cloneRange();
+  };
+  rtRestore() {
+    if (this.rtHost()) return true;
+    if (!this.savedRange) return false;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(this.savedRange);
+    const host = this.rtHost();
+    if (host) host.focus();
+    return !!host;
+  }
+  /* Build a field's editor bindings: load once, save on every keystroke. */
+  rtBind(getValue, save) {
+    return {
+      rtRef: (el) => {
+        if (!el) return;
+        el._save = save;
+        const want = getValue();
+        if (el._loaded !== want && document.activeElement !== el) {
+          el.innerHTML = want || "";
+          el._loaded = want;
+        }
+      },
+      rtInput: (e) => { const v = e.target.innerHTML; e.target._loaded = v; save(v); this.flash("Saved"); }
+    };
+  }
+
+  rtHost() {
+    const n = window.getSelection && window.getSelection().anchorNode;
+    if (!n) return null;
+    const el = n.nodeType === 1 ? n : n.parentElement;
+    return el && el.closest ? el.closest(".rt") : null;
+  }
+  /* Push the edited HTML back into the draft store. */
+  rtCommit() {
+    const host = this.rtHost();
+    if (!host || !host._save) return;
+    host._save(host.innerHTML);
+    this.flash("Saved");
+  }
+
+  flash(msg) {
+    this.setState({ saved: msg });
+    clearTimeout(this.fl);
+    this.fl = setTimeout(() => this.setState({ saved: "" }), 1600);
+  }
+  navStyle(p) {
+    const on = this.state.page === p;
+    return "text-align: left; padding: 10px 12px; border-radius: 10px; border: 0; cursor: pointer; font-size: 13.5px; transition: background .2s, color .2s;"
+      + (on ? "background: rgba(110,163,255,.14); color: #cfe0ff; font-weight: 500;" : "background: transparent; color: #8b90a0;");
+  }
+  pillStyle(on) {
+    return "padding: 8px 16px; border-radius: 999px; border: 0; cursor: pointer; font-size: 13px; transition: background .2s, color .2s;"
+      + (on ? "background: rgba(110,163,255,.16); color: #cfe0ff; font-weight: 500;" : "background: transparent; color: #8b90a0;");
+  }
+
+  list() { return (window.CMS && window.CMS.projects()) || []; }
+  write(next) { window.CMS.saveProjects(next); this.flash("Saved"); }
+  patch(id, key, value) { this.write(this.list().map((p) => (p.id === id ? { ...p, [key]: value } : p))); }
+  move(id, dir) {
+    const l = this.list().slice();
+    const i = l.findIndex((p) => p.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= l.length) return;
+    const t = l[i]; l[i] = l[j]; l[j] = t;
+    this.write(l);
+  }
+
+  /* Long-form formats: fields derive from the site's data-cms snapshot. */
+  prefixGroups(prefix, ns) {
+    const derived = window.CMS ? window.CMS.derivedFields(prefix) : [];
+    const defs = window.CMS ? window.CMS.defaults() : {};
+    const out = [];
+    const mdefs = window.CMS ? window.CMS.mediaDefaults() : {};
+    derived.forEach((f) => {
+      /* Each heading in the page starts a new group, named after that heading. */
+      if (f.kind === "text" && (f.tag === "h1" || f.tag === "h2" || f.tag === "h3")) {
+        out.push({ title: f.label, fields: [] });
+      }
+      if (!out.length) out.push({ title: "Intro", fields: [] });
+
+      if (f.kind === "media") {
+        const ov = window.CMS.mediaFor(f.key, ns) || {};
+        const def = mdefs[f.key] || {};
+        const setSrc = (src) => {
+          window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : "image", src });
+          this.flash("Saved");
+        };
+        out[out.length - 1].fields.push({
+          upload: () => this.pickFile(setSrc),
+          media: true, text: false, rows: 1, noSelect: false, hasSelect: true, typeLabel: "",
+          label: f.label || "Media",
+          type: ov.type || def.type || "image",
+          isVideo: (ov.type || def.type) === "video",
+          value: ov.src !== undefined && ov.src !== "" ? ov.src : (def.src || ""),
+          placeholder: "uploads/file." + ((ov.type || def.type) === "video" ? "mp4" : "jpg"),
+          setType: (e) => {
+            const cur = window.CMS.mediaFor(f.key, ns) || def;
+            window.CMS.setMedia(f.key, ns, { type: e.target.value, src: cur.src || "" });
+            this.flash("Saved");
+          },
+          onInput: (e) => {
+            const t = (window.CMS.mediaFor(f.key, ns) || def).type || "image";
+            const src = e.target.value;
+            window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : t, src });
+            this.flash("Saved");
+          },
+          reset: () => { window.CMS.setMedia(f.key, ns, null); this.flash("Reverted"); }
+        });
+        return;
+      }
+
+      out[out.length - 1].fields.push({
+        text: true, media: false,
+        label: (f.tag === "p" ? "" : f.tag.toUpperCase() + " · ") + f.label,
+        rows: f.tag === "p" ? 4 : 2,
+        value: (() => {
+          const v = window.CMS.lookup(f.key, ns);
+          return v === undefined ? (defs[f.key] || "") : v;
+        })(),
+        ...this.rtBind(
+          () => { const v = window.CMS.lookup(f.key, ns); return v === undefined ? (window.CMS.defaults()[f.key] || "") : v; },
+          (v) => window.CMS.setText(window.CMS.nsKey(f.key, ns), v)
+        ),
+        reset: () => { window.CMS.setText(window.CMS.nsKey(f.key, ns), null); this.flash("Reverted"); }
+      });
+    });
+    return out;
+  }
+
+  /* Product format: fields read/write the per-case detail object. */
+  dataGroups(id) {
+    const ov = window.CMS ? window.CMS.detail(id) : {};
+    const base = (window.CMS ? window.CMS.caseDefaults()[id] : null) || {};
+    const get = (path) => {
+      const parts = path.split(".");
+      let a = ov, b = base;
+      for (const k of parts) { a = a && typeof a === "object" ? a[k] : undefined; b = b && typeof b === "object" ? b[k] : undefined; }
+      /* Empty override means "not overridden" — same rule the site applies. */
+      if (a !== undefined && a !== null && a !== "") return a;
+      return b !== undefined && b !== null ? b : "";
+    };
+    const isMediaPath = (path) => /(^|\.)(heroSrc|outcomeSrc|src)$/.test(path);
+    const field = (path, label, rows) => (isMediaPath(path) ? {
+      media: true, text: false, rows: 1, label, noSelect: true, hasSelect: false,
+      upload: () => this.pickFile((src) => { window.CMS.setDetail(id, path, src); this.flash("Saved"); }),
+      type: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "video" : "image",
+      isVideo: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")),
+      typeLabel: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "Video" : "Photo",
+      placeholder: "uploads/file.jpg or uploads/clip.mp4",
+      value: String(get(path) || ""),
+      setType: () => {},
+      onInput: (e) => { window.CMS.setDetail(id, path, e.target.value); this.flash("Saved"); },
+      reset: () => { window.CMS.setDetail(id, path, null); this.flash("Reverted"); }
+    } : {
+      text: true, media: false,
+      label, rows: rows || 2,
+      value: String(get(path) || ""),
+      ...this.rtBind(() => String(get(path) || ""), (v) => window.CMS.setDetail(id, path, v)),
+      reset: () => { window.CMS.setDetail(id, path, null); this.flash("Reverted"); }
+    });
+
+    return DATA_SCHEMA.map((g) => {
+      if (!g.repeat) return { title: g.title, fields: g.fields.map((f) => field(f.path, f.label, f.rows)) };
+      const count = Math.max(
+        (base[g.repeat] || []).length,
+        (ov[g.repeat] || []).length,
+        1
+      );
+      const fields = [];
+      for (let i = 0; i < count; i++) {
+        if (g.scalar) fields.push(field(g.repeat + "." + i, g.label + " " + (i + 1), g.rows));
+        else g.of.forEach((f) => fields.push(field(g.repeat + "." + i + "." + f.path, (i + 1) + " · " + f.label, f.rows)));
+      }
+      return { title: g.title, fields };
+    });
+  }
+
+  renderVals() {
+    /* Idempotent, and re-asserted here so a hot reload can't drop the panel
+       back into writing straight to the published copy. */
+    if (window.CMS) window.CMS.enterDraftMode();
+    const page = this.state.page;
+    const editing = this.state.editing;
+    const defs = window.CMS ? window.CMS.defaults() : {};
+    const over = window.CMS ? window.CMS.text() : {};
+    const items = this.list();
+    const entry = editing ? items.find((p) => p.id === editing) : null;
+    const lk = layoutKey(entry);
+    const fmt = lk ? LAYOUT[lk] : null;
+    const R = (window.CMS && window.CMS.remote) || { available: false, admin: false };
+    /* Server stats when the site is hosted; this browser's own when it isn't. */
+    const S = this.state.serverStats
+      || (window.CMS ? window.CMS.summary() : { sessions: 0, events: 0, caseOpens: 0, ctas: 0, byCase: {}, dwell: {}, recent: [], series: [], depth: 0 });
+
+    const dwellVals = Object.keys(S.dwell).map((k) => ({ k, v: S.dwell[k] }));
+    const dMax = Math.max(1, ...dwellVals.map((d) => d.v));
+    const caseVals = Object.keys(S.byCase).map((k) => ({ k, v: S.byCase[k] })).sort((a, b) => b.v - a.v);
+    const cMax = Math.max(1, ...caseVals.map((c) => c.v));
+    const sMax = Math.max(1, ...(S.series || []).map((d) => d.n));
+    const totalDwell = dwellVals.reduce((a, d) => a + d.v, 0);
+
+    const pageGroups = !entry ? [] : (fmt && fmt.kind === "prefix") ? this.prefixGroups(fmt.prefix, entry.id)
+      : (fmt && fmt.kind === "data") ? this.dataGroups(entry.id) : [];
+
+    const titles = {
+      content: ["Home page", "Edits are saved as a draft. Nothing changes on the live site until you press Publish."],
+      work: ["Work", "Three sections, each with its own page format. Edits stay in draft until you press Publish."],
+      stats: ["Analytics", "Visits, dwell time and engagement collected on this device."]
+    };
+
+    return {
+      pageTitle: entry ? entry.title : titles[page][0],
+      pageSub: entry ? (SECTION_NAME[(entry.groups || ["live"])[0]] + " · " + (entry.tag || "")) : titles[page][1],
+      rtHold: (e) => e.preventDefault(),
+      rtBold: () => { this.rtRestore() && this.rtExec("bold"); },
+      rtItalic: () => { this.rtRestore() && this.rtExec("italic"); },
+      rtUnderline: () => { this.rtRestore() && this.rtExec("underline"); },
+      rtStrike: () => { this.rtRestore() && this.rtExec("strikeThrough"); },
+      rtWhite: () => { this.rtRestore() && this.rtStyle("color", "#ffffff"); },
+      rtBlue: () => { this.rtRestore() && this.rtStyle("color", "var(--color-accent)"); },
+      rtGrey: () => { this.rtRestore() && this.rtStyle("color", "var(--body-copy)"); },
+      rtMuted: () => { this.rtRestore() && this.rtStyle("color", "var(--color-neutral-600)"); },
+      rtFont: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (!v || !this.rtRestore()) return;
+        if (v === "accent") this.rtAccentFont();
+        else this.rtStyle("fontFamily", v === "heading" ? "var(--font-heading)" : "var(--font-body)");
+      },
+      rtWeight: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (v && this.rtRestore()) this.rtStyle("fontWeight", v);
+      },
+      rtClearFmt: () => { this.rtRestore() && this.rtClear(); },
+
+      savedLabel: this.state.saved || (R.available ? (this.dirty() ? "Unpublished changes" : "Published") : "Local"),
+      onServer: R.available,
+      canUpload: true,
+      needsLogin: R.available && !R.admin,
+      loginError: !!this.state.loginErr,
+      loginErrorText: this.state.loginErr || "",
+      setPw: (e) => { this.pw = e.target.value; },
+      doLogin: (e) => {
+        e.preventDefault();
+        window.CMS.login(this.pw || "").then((ok) => {
+          this.setState({ loginErr: ok ? "" : "Wrong password. Try again." });
+          if (ok) window.CMS.loadRemote();
+        });
+      },
+      doLogout: () => window.CMS.logout(),
+      publishLabel: R.saving ? "Publishing…"
+        : (R.error ? R.error
+        : (this.dirty() ? (R.available ? "Publish changes" : "Publish — get content.json") : "Nothing to publish")),
+      publishStyle: "padding: 9px 17px; border-radius: 999px; border: 0; font-size: 13px; font-weight: 600; cursor: pointer; "
+        + (this.dirty() && !R.saving
+          ? "background: var(--accent); color: #08111f;"
+          : "background: #182034; color: #6b7080;"),
+      doPublish: () => {
+        /* With a PHP backend this goes live instantly; on static hosting it
+           hands you the file to commit. */
+        if (R.available) {
+          window.CMS.publish().then((ok) => this.flash(ok ? "Published — live now" : "Publish failed"));
+          return;
+        }
+        window.CMS.publishFile();
+        this.setState({ showCommit: true });
+        this.flash("content.json downloaded");
+      },
+      closeCommit: () => this.setState({ showCommit: false }),
+      showCommit: !!this.state.showCommit,
+      doDiscard: () => {
+        if (!confirm("Throw away every edit made since the last publish?")) return;
+        window.CMS.discardDraft();
+        this.flash("Back to published");
+      },
+      doRestore: () => {
+        if (!confirm("Roll the live site back to the version published before the last one?")) return;
+        window.CMS.restoreLastPublish().then((ok) => this.flash(ok ? "Rolled back" : "Nothing to roll back"));
+      },
+
+      needsSite: !Object.keys(defs).length && page !== "stats",
+      isContent: page === "content",
+      isWorkList: page === "work" && !editing,
+      inEditor: page === "work" && !!entry,
+      isStats: page === "stats",
+      navContent: this.navStyle("content"),
+      navWork: this.navStyle("work"),
+      navStats: this.navStyle("stats"),
+      goContent: () => this.setState({ page: "content", editing: null }),
+      goWork: () => this.setState({ page: "work", editing: null }),
+      goStats: () => { this.setState({ page: "stats", editing: null }); this.pullStats(); },
+      closeEditor: () => this.setState({ editing: null }),
+
+      fields: (window.CMS ? window.CMS.FIELDS : []).map((f) => ({
+        ...f,
+        hasHint: !!f.hint,
+        hint: f.hint || "",
+        rows: f.type === "area" || f.type === "rich" ? 3 : 2,
+        disabled: !Object.keys(defs).length,
+        value: Object.prototype.hasOwnProperty.call(over, f.key) ? over[f.key] : (defs[f.key] || ""),
+        ...this.rtBind(
+          () => (Object.prototype.hasOwnProperty.call(window.CMS.text(), f.key) ? window.CMS.text()[f.key] : (window.CMS.defaults()[f.key] || "")),
+          (v) => { if (Object.keys(window.CMS.defaults()).length) window.CMS.setText(f.key, v); }
+        ),
+        reset: () => { window.CMS.setText(f.key, null); this.flash("Reverted"); }
+      })),
+      resetAllText: () => { window.CMS.resetText(); this.flash("Reverted all"); },
+
+      sections: SECTION_META.map((sec) => {
+        const rows = items.filter((p) => (p.groups || ["live"])[0] === sec.key);
+        return {
+          title: sec.title,
+          note: sec.note,
+          empty: !rows.length,
+          add: () => {
+            const id = "new-" + Date.now().toString(36);
+            this.write(items.concat([{ id, title: "Untitled entry", tag: "Category", platform: "Platform", img: "", groups: [sec.key], body: "One or two lines on what this project was." }]));
+            this.setState({ editing: id, editTab: "card" });
+          },
+          items: rows.map((p) => ({
+            ...p,
+            meta: (p.tag || "") + " · " + (p.platform || ""),
+            thumbCss: p.img ? 'url("' + p.img + '")' : "none",
+            edit: () => this.setState({ editing: p.id, editTab: "card" }),
+            dup: () => {
+              const id = window.CMS.duplicate(p.id);
+              this.flash("Duplicated");
+              if (id) this.setState({ editing: id, editTab: "card" });
+            },
+            up: () => this.move(p.id, -1),
+            down: () => this.move(p.id, 1),
+            remove: () => { if (confirm("Remove “" + p.title + "” from the site?")) this.write(items.filter((x) => x.id !== p.id)); }
+          }))
+        };
+      }),
+      resetCases: () => { if (confirm("Restore the original five entries?")) { window.CMS.saveProjects(SEED.map((p) => ({ ...p }))); this.flash("Restored"); } },
+
+      onCard: this.state.editTab === "card",
+      onPage: this.state.editTab === "page",
+      tabCard: () => this.setState({ editTab: "card" }),
+      tabPage: () => this.setState({ editTab: "page" }),
+      tabCardStyle: this.pillStyle(this.state.editTab === "card"),
+      tabPageStyle: this.pillStyle(this.state.editTab === "page"),
+      formatNote: fmt ? fmt.note : "",
+      noPageFields: !!entry && !pageGroups.length && !(fmt && fmt.kind === "prefix"),
+      needsReload: !!entry && !pageGroups.length && !!(fmt && fmt.kind === "prefix"),
+      pageGroups,
+      e: entry ? {
+        ...entry,
+        group: (entry.groups || ["live"])[0],
+        setTitle: (ev) => this.patch(entry.id, "title", ev.target.value),
+        setTag: (ev) => this.patch(entry.id, "tag", ev.target.value),
+        setPlatform: (ev) => this.patch(entry.id, "platform", ev.target.value),
+        ...(() => { const b = this.rtBind(() => entry.body || "", (v) => this.patch(entry.id, "body", v));
+          return { bodyRef: b.rtRef, bodyInput: b.rtInput }; })(),
+        uploadImg: () => this.pickFile((src) => this.patch(entry.id, "img", src)),
+        setImg: (ev) => this.patch(entry.id, "img", ev.target.value),
+        setGroup: (ev) => this.patch(entry.id, "groups", [ev.target.value]),
+        layout: lk || "",
+        nativeLayout: !!NATIVE_FORMAT[entry.source || entry.id],
+        setLayout: (ev) => this.patch(entry.id, "format", ev.target.value || null)
+      } : { title: "", tag: "", platform: "", body: "", img: "", group: "live", layout: "", nativeLayout: true },
+      layoutLabel: fmt ? fmt.label : "Card only",
+      canPickLayout: !!entry && !NATIVE_FORMAT[entry.source || entry.id],
+
+      kpis: [
+        { label: this.state.serverStats ? "Visitors" : "Visits", value: String(this.state.serverStats ? S.visitors : S.sessions), note: this.state.serverStats ? "unique, all devices" : "sessions on this device", color: "#e9eaee" },
+        { label: "Case opens", value: String(S.caseOpens), note: "detail pages viewed", color: "#6EA3FF" },
+        { label: "Total time", value: totalDwell ? fmtTime(totalDwell) : "—", note: "across all pages", color: "#27C291" },
+        { label: "Scroll depth", value: S.depth ? S.depth + "%" : "—", note: "deepest reached", color: "#FF7C3F" },
+        { label: "Contact clicks", value: String(S.ctas), note: "email / CV taps", color: "#B06BFF" }
+      ],
+      series: (S.series || []).map((d) => ({ ...d, h: Math.max(3, Math.round((d.n / sMax) * 118)) + "px", fill: d.n ? "var(--accent)" : "#151a25" })),
+      dwell: dwellVals.sort((a, b) => b.v - a.v).map((d) => ({ name: d.k === "home" ? "Home page" : d.k, time: fmtTime(d.v), pct: Math.round((d.v / dMax) * 100) + "%" })),
+      noDwell: !dwellVals.length,
+      topCases: caseVals.map((c) => ({ name: c.k, n: String(c.v), pct: Math.round((c.v / cMax) * 100) + "%" })),
+      noCases: !caseVals.length,
+      recent: (S.recent || []).map((e) => ({ type: e.type, label: e.label || "—", time: new Date(e.t).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) })),
+      noEvents: !(S.recent || []).length,
+      statsNote: this.state.serverStats
+        ? "Live figures from the server, counting every visitor. Unique visitors are identified by a daily rotating hash — no cookies, no IP addresses stored."
+        : "These numbers come from this browser only. Once the site is on your hosting, the panel reads real cross-visitor figures from the server automatically.",
+      clearStats: () => {
+        if (!confirm("Delete all collected analytics?")) return;
+        window.CMS.clearMetrics();
+        if (R.available && R.admin) window.CMS.remoteStats(true).then(() => { this.setState({ serverStats: null }); this.pullStats(); });
+        this.flash("Cleared");
+      },
+      doExport: () => {
+        const blob = new Blob([window.CMS.exportAll()], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "portfolio-content.json";
+        a.click();
+        this.flash("Exported");
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
