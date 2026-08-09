@@ -46,8 +46,21 @@
   body {
     margin: 0; overflow-x: hidden;
     background: #000;
-    color: #e9e9ed;
+    color: #fff;
   }
+  /* Any text without its own colour is white — never a browser default. */
+  h1, h2, h3, h4, h5, h6, p, li, span, div, td, th, label, figcaption,
+  strong, em, small, blockquote, section, article, header, footer, nav, button {
+    color: inherit;
+  }
+  input, textarea, select { color: #fff; }
+  /* Keep media on its own composited layer so a hover repaint on the parent
+     (border, transform) can't make the image blink while it re-rasterises. */
+  .card-img image-slot, .card-img img, .tool img, .dock img {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+  .card-img { backface-visibility: hidden; }
   h1, h2, h3, h4, h5, h6 { color: #fff; }
   a { color: var(--color-accent); text-decoration: none; }
   a:hover { color: var(--color-accent-300); }
@@ -121,7 +134,7 @@
 </style>
 </helmet>
 
-<div style="font-family: var(--font-body); color: #e9e9ed; background: transparent; min-height: 100vh; position: relative; overflow: hidden;">
+<div style="font-family: var(--font-body); color: #fff; background: transparent; min-height: 100vh; position: relative; overflow: hidden;">
 
 
 
