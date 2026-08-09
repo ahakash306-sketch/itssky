@@ -42,11 +42,13 @@
     --font-body: "Inter", system-ui, sans-serif;
     --body-copy: #C2C2C2;
   }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; color-scheme: dark; }
   body {
     margin: 0; overflow-x: hidden;
     background: #000;
+    color: #e9e9ed;
   }
+  h1, h2, h3, h4, h5, h6 { color: #fff; }
   a { color: var(--color-accent); text-decoration: none; }
   a:hover { color: var(--color-accent-300); }
   @keyframes marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
@@ -119,7 +121,7 @@
 </style>
 </helmet>
 
-<div style="font-family: var(--font-body); color: var(--color-text); background: transparent; min-height: 100vh; position: relative; overflow: hidden;">
+<div style="font-family: var(--font-body); color: #e9e9ed; background: transparent; min-height: 100vh; position: relative; overflow: hidden;">
 
 
 
