@@ -3,29 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
-  
-<meta property="og:title" content="Akash — UX Designer">
-<meta property="og:description" content="UX Designer crafting thoughtful digital products and experiences.">
-<meta property="og:image" content="https://itssky.co.in/og_image.jpg">
-<meta property="og:url" content="https://itssky.co.in/">
-<meta property="og:type" content="website">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Akash — UX Designer">
-<meta name="twitter:description" content="UX Designer crafting thoughtful digital products and experiences.">
-<meta name="twitter:image" content="https://itssky.co.in/og_image.jpg">
-    
 <script src="./support.js"></script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "xzze56a571");
-</script>
-  
 </head>
 <body>
 <x-dc>
@@ -61,12 +39,52 @@
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   [data-rise] { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
   a[aria-disabled="true"] { cursor: default; }
+
+  /* ---- phones and tablets in portrait ----
+     The desktop layout is a narrow 80vw column with type tuned for a big screen;
+     on a handheld that leaves too little width and text a few points too small.
+     Sizes are authored inline, so they are lifted here by their own values. */
+  @media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (pointer: coarse) {
+    .shell { width: 95vw !important; }
+    #top { min-height: 0 !important; padding-top: 8px !important; }
+    #top h1 { font-size: 30px !important; }
+    [style*="font-size: 10.5px"] { font-size: 12px !important; }
+    [style*="font-size: 11px"] { font-size: 12.5px !important; }
+    [style*="font-size: 11.5px"] { font-size: 13px !important; }
+    [style*="font-size: 12px"] { font-size: 13.5px !important; }
+    [style*="font-size: 12.5px"] { font-size: 14px !important; }
+    [style*="font-size: 13px"] { font-size: 14.5px !important; }
+    [style*="font-size: 13.5px"] { font-size: 15px !important; }
+    [style*="font-size: 14px"] { font-size: 15.5px !important; }
+    [style*="font-size: 14.5px"] { font-size: 16px !important; }
+    [style*="font-size: 15px"] { font-size: 16.5px !important; }
+    [style*="font-size: 15.5px"] { font-size: 17px !important; }
+    [style*="font-size: 16px"] { font-size: 17.5px !important; }
+    [style*="font-size: 16.5px"] { font-size: 18px !important; }
+    [style*="font-size: 17px"] { font-size: 18.5px !important; }
+    [style*="clamp(15px, 1.6vw, 19px)"] { font-size: 17px !important; }
+    [style*="clamp(20px, 2.6vw, 34px)"] { font-size: 25px !important; }
+    [style*="clamp(19px, 2.2vw, 28px)"] { font-size: 22px !important; }
+    [style*="clamp(17px, 1.9vw, 23px)"] { font-size: 19.5px !important; }
+    [style*="clamp(19px, 2vw, 26px)"] { font-size: 22px !important; }
+    [style*="clamp(22px, 3vw, 40px)"] { font-size: 29px !important; }
+    [style*="clamp(19px, 2.2vw, 26px)"] { font-size: 22px !important; }
+    [style*="clamp(23px, 3.1vw, 36px)"] { font-size: 26px !important; }
+    [style*="clamp(26px, 3.2vw, 38px)"] { font-size: 30px !important; }
+    [style*="clamp(30px, 4vw, 46px)"] { font-size: 34px !important; }
+    /* comfortable tap targets on the small links and pills */
+    header a, #contact a { padding-block: 6px; }
+  }
+  @media (max-width: 600px) {
+    .hero-photo { width: 108px !important; height: 108px !important; }
+    #top h1 { font-size: 26px !important; }
+  }
   @keyframes preRing { from { stroke-dashoffset: 301.6; } to { stroke-dashoffset: 0; } }
   @keyframes preSpin { to { transform: rotate(360deg); } }
   @keyframes preOut { 0%, 88% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
   @keyframes preLift { 0%, 88% { transform: none; opacity: 1; } 100% { transform: scale(.92); opacity: 0; } }
   /* Anything that isn't a desktop gets the note instead, and five seconds to read it. */
-  @media (max-width: 1024px), (pointer: coarse) {
+  @media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (pointer: coarse) {
     .pre { animation-duration: 5.4s !important; }
     .pre > div { animation-duration: 5.4s !important; }
     .pre-ring { animation-duration: 5s !important; }
@@ -862,7 +880,7 @@
     </div>
   </sc-if>
 
-<div style="min-height: 100vh; background: #0a0a0a; color: #f2f0ed; width: 80vw; max-width: 100%; margin: 0 auto;">
+<div class="shell" style="min-height: 100vh; background: #0a0a0a; color: #f2f0ed; width: 80vw; max-width: 100%; margin: 0 auto;">
 
 
   <canvas ref="{{ sprayRef }}" style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; touch-action: none;"></canvas>
@@ -916,6 +934,8 @@
     <div style="display: flex; align-items: center; gap: clamp(14px, 2.2vw, 30px); font-family: 'Google Sans Flex', system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase;">
       <a href="#work" style="color: #8b8880;" style-hover="color: #f2f0ed;">Work</a>
       <a href="#about" style="color: #8b8880;" style-hover="color: #f2f0ed;">About</a>
+      <!-- Labs: no page yet. Swap href="" for the real URL and drop the two handlers below. -->
+      <a href="" title="Coming soon" aria-disabled="true" onClick="{{ blockNav }}" style="color: #55524c;" style-hover="color: #8b8880;">Labs</a>
       <a href="#contact" style="color: #8b8880;" style-hover="color: #f2f0ed;">Contact</a>
       <sc-if value="{{ sprayOff }}" hint-placeholder-val="{{ true }}">
         <button type="button" aria-label="Spray paint mode" title="Spray paint" onClick="{{ toggleSpray }}" style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: transparent; border: 1px solid transparent; border-radius: 6px; color: #6b6862; cursor: pointer; transition: color .3s, border-color .3s;" style-hover="color: #f2f0ed; border-color: #24231f;"><svg viewBox="0 0 24 24" fill="none" style="display: block; width: 15px; height: 15px;"><rect x="7.5" y="8.5" width="9" height="12" rx="2" stroke="currentColor" stroke-width="1.3"></rect><path d="M10 8.5V6.2h4v2.3" stroke="currentColor" stroke-width="1.3"></path><circle cx="18.6" cy="4.4" r=".9" fill="currentColor"></circle><circle cx="20.6" cy="6.6" r=".7" fill="currentColor"></circle><circle cx="18.2" cy="7.8" r=".6" fill="currentColor"></circle></svg></button>
@@ -928,7 +948,7 @@
 
   <section id="top" data-screen-label="Hero" style="min-height: calc(100vh - 90px); display: flex; align-items: center; padding: clamp(28px, 5vh, 60px) 0 clamp(28px, 5vh, 60px);">
     <div style="width: 100%;">
-      <div data-rise="" style="width: 140px; height: 140px; border-radius: 999px; overflow: hidden; margin: 0 0 clamp(20px, 3vh, 34px);">
+      <div class="hero-photo" data-rise="" style="width: 140px; height: 140px; border-radius: 999px; overflow: hidden; margin: 0 0 clamp(20px, 3vh, 34px);">
         <img src="uploads/About%20pic.png" alt="Portrait" data-cms-media="home.photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
       </div>
       <p data-rise="" style="margin: 0 0 clamp(10px, 1.4vh, 16px); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #8b8880;" data-cms="hero.kicker">Hi, I&rsquo;m Akash</p>
@@ -1122,7 +1142,7 @@ WORKS.forEach((w) => {
 const TABS = [
   { id: "cases", label: "Case Studies" },
   { id: "live", label: "Live Products" },
-  { id: "labs", label: "MVPs & Experiments" }
+  { id: "labs", label: "MVPs" }
 ];
 
 const CRAFT = [
@@ -1812,6 +1832,8 @@ class Component extends DCLogic {
         hasClients: !!(dbase.clients || []).length
       } : { name: "", statLead: "", statRest: "", lede: "", links: [], slotHero: "", slotOutcome: "", heroIsVideo: false, heroIsPhoto: true, outcomeIsVideo: false, outcomeIsPhoto: true, facts: [], impact: [], overview: [], role: [], team: [], clientsLabel: "", clients: [], hasClients: false, ctaLinks: [] },
       journeyOpen: this.state.journeyOpen,
+      /* Labs has no destination yet — the nav item is present but inert. */
+      blockNav: (e) => { e.preventDefault(); },
       sprayRef: this.sprayRef, toggleSpray: this.toggleSpray,
       sprayOn: this.state.spray, sprayOff: !this.state.spray,
       openJourney: this.openJourney, closeJourney: this.closeJourney,

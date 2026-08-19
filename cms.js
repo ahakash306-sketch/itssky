@@ -59,7 +59,7 @@
   ];
 
   var GROUPS = ["live", "cases", "labs"];
-  var GROUP_LABEL = { live: "Live Products", cases: "Case Studies", labs: "Experiments & MVPs" };
+  var GROUP_LABEL = { live: "Live Products", cases: "Case Studies", labs: "MVPs" };
 
   function readJSON(k, fallback) {
     try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }

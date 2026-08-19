@@ -273,7 +273,7 @@
               <select onChange="{{ e.setGroup }}" value="{{ e.group }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;">
                 <option value="cases">Case Studies</option>
                 <option value="live">Live Products</option>
-                <option value="labs">MVPs &amp; Experiments</option>
+                <option value="labs">MVPs</option>
               </select>
             </label>
             <sc-if value="{{ canPickLayout }}" hint-placeholder-val="{{ false }}">
@@ -416,9 +416,9 @@
 const SECTION_META = [
   { key: "cases", title: "Case Studies", note: "Long-form format — narrative sections, quote, impact stats." },
   { key: "live", title: "Live Products", note: "Product format — stat headline, fact rail, impact cards, NDA close." },
-  { key: "labs", title: "MVPs & Experiments", note: "MVP format — research steps, screen grid, features, learnings." }
+  { key: "labs", title: "MVPs", note: "MVP format — research steps, screen grid, features, learnings." }
 ];
-const SECTION_NAME = { cases: "Case Studies", live: "Live Products", labs: "MVPs & Experiments" };
+const SECTION_NAME = { cases: "Case Studies", live: "Live Products", labs: "MVPs" };
 
 /* Page layouts and how each one's fields are sourced. */
 const LAYOUT = {
