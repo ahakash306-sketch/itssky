@@ -1,9 +1,0 @@
-# Uploaded files are data, never code. This file goes INSIDE public_html/uploads/
-# and stops anything here from ever being executed by the server.
-
-RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .cgi .pl
-RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .cgi .pl
-
-<FilesMatch "\.(php|phtml|php[0-9]|cgi|pl|py|sh)$">
-  Require all denied
-</FilesMatch>
