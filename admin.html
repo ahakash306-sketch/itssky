@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-e6e5a964-478d-4f51-ac86-b0fb09ee6146/styles.css">
+<script src="./cms.js"></script>
+<script src="./case-data.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&amp;display=swap">
+<style>
+  /* The editor must preview the SITE's tokens, not the design system's defaults —
+     otherwise the swatch you click is not the colour that ships. Mirrors the
+     :root block in index.html. */
+  :root {
+    --ink: #0e0e0d; --edge: #1c1b18; --body-copy: #8b8880; --accent: #f2f0ed;
+    --color-accent: #f2f0ed;
+    --color-accent-100: #f0f6ff;
+    --color-accent-200: #dbe9ff;
+    --color-accent-300: #b9d3ff;
+    --color-accent-400: #93bbff;
+    --color-accent-500: #f2f0ed;
+    --color-accent-600: #4d83db;
+    --color-accent-700: #3a63a8;
+    --color-accent-800: #294574;
+    --color-accent-900: #1b2c49;
+    --font-heading: 'Google Sans Flex', system-ui, sans-serif;
+    --font-body: 'Google Sans Flex', system-ui, sans-serif;
+  }
+  body { margin: 0; background: #0a0a0a; color: #e9eaee; font-family: 'Google Sans Flex', system-ui, sans-serif; }
+  h1, h2, h3 { font-family: 'Google Sans Flex', system-ui, sans-serif; }
+  input, textarea, select, button { font-family: inherit; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent) !important; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: #9dc0ff; }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: #23283a; border-radius: 8px; }
+  @media (max-width: 860px) { .shell { grid-template-columns: 1fr !important; } .side { position: static !important; height: auto !important; flex-direction: row !important; overflow-x: auto; } }
+
+  /* --- rich text field --- */
+  .rt-wrap { border: 1px solid var(--edge); border-radius: 10px; background: #0e0e0d; overflow: hidden; }
+  .rt-wrap:focus-within { border-color: var(--accent); }
+  .rt-bar { display: none; flex-wrap: wrap; align-items: center; gap: 3px; padding: 6px 7px;
+    background: #121722; border-bottom: 1px solid var(--edge); }
+  .rt-wrap:focus-within .rt-bar, .rt-wrap:hover .rt-bar { display: flex; }
+  .rt-bar button, .rt-bar select {
+    height: 27px; min-width: 27px; padding: 0 7px; border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent; background: transparent; color: #c3c8d4; font-size: 12.5px; line-height: 1;
+  }
+  .rt-bar button:hover, .rt-bar select:hover { background: #1c2331; color: #fff; }
+  .rt-bar select { border-color: var(--edge); background: #0e0e0d; padding-right: 4px; }
+  .rt-bar .sep { width: 1px; height: 18px; background: var(--edge); margin: 0 4px; }
+  .rt-sw { width: 20px; height: 20px; min-width: 20px; padding: 0; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.22); cursor: pointer; }
+  .rt-sw:hover { transform: scale(1.12); }
+  .rt {
+    min-height: 44px; padding: 11px 13px; font-size: 14px; line-height: 1.65; color: #e9eaee;
+    outline: none; white-space: pre-wrap; word-break: break-word;
+  }
+  .rt:empty::before { content: attr(data-ph); color: #4d5464; }
+  /* Mirror the site's own accent type so what you style is what you get. */
+  .rt .em { font-family: 'Google Sans Flex', system-ui, sans-serif; font-style: normal; font-weight: 300; color: #f2f0ed; }
+</style>
+</helmet>
+
+<div class="shell" style="display: grid; grid-template-columns: 232px 1fr; min-height: 100vh;">
+
+  <aside class="side" style="position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 4px; padding: 22px 14px; background: #0c0c0b; border-right: 1px solid var(--edge);">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 0 8px 20px;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
+      <span style="font-size: 14px; font-weight: 600; letter-spacing: -.01em;">Studio</span>
+    </div>
+    <button type="button" onClick="{{ goContent }}" style="{{ navContent }}">Home page</button>
+    <button type="button" onClick="{{ goWork }}" style="{{ navWork }}">Work</button>
+    <div style="flex: 1;"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <button type="button" onClick="{{ doDiscard }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid var(--edge); background: transparent; color: #8b8880; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Discard unpublished edits</button>
+      <button type="button" onClick="{{ doRestore }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,150,120,.28); background: transparent; color: #ffb59a; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #ffb59a;">Undo last publish</button>
+      <a href="index.html?preview=1" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
+      <sc-if value="{{ onServer }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ doLogout }}" style="padding: 9px 12px; border-radius: 10px; border: 0; background: transparent; color: #55524c; font-size: 12px; text-align: left; cursor: pointer;" style-hover="color: #fff;">Sign out</button>
+      </sc-if>
+    </div>
+  </aside>
+
+  <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; background: #0a0a0a;">
+      <form onSubmit="{{ doLogin }}" style="width: 100%; max-width: 340px; border: 1px solid var(--edge); background: var(--ink); border-radius: 18px; padding: 26px;">
+        <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 18px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
+          <span style="font-size: 14px; font-weight: 600;">Studio</span>
+        </div>
+        <label style="display: block; font-size: 12px; color: #6b6862; margin-bottom: 7px;">Password</label>
+        <input type="password" onInput="{{ setPw }}" autofocus="true" style="width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 14px;">
+        <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 10px 0 0; font-size: 12.5px; color: #ff9a9a;">{{ loginErrorText }}</p>
+        </sc-if>
+        <button type="submit" style="width: 100%; margin-top: 16px; padding: 12px; border-radius: 999px; border: 0; background: var(--accent); color: #08111f; font-size: 14px; font-weight: 600; cursor: pointer;">Sign in</button>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCommit }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 210; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(3,5,10,.82);">
+      <div style="width: 100%; max-width: 460px; border: 1px solid var(--edge); background: var(--ink); border-radius: 18px; padding: 26px;">
+        <h2 style="margin: 0 0 10px; font-size: 18px; font-weight: 600;">One step left</h2>
+        <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.65; color: var(--body-copy);">GitHub Pages can't save files, so your edits came down as <strong style="color: #fff;">content.json</strong>. Commit that file to publish them.</p>
+        <ol style="margin: 0 0 20px; padding-left: 18px; display: flex; flex-direction: column; gap: 9px; font-size: 13.5px; line-height: 1.6; color: var(--body-copy);">
+          <li>Open your repository on GitHub.</li>
+          <li>Drag <strong style="color: #fff;">content.json</strong> into the folder holding <strong style="color: #fff;">index.html</strong> — replacing the old one.</li>
+          <li>Commit. The site updates in about a minute.</li>
+        </ol>
+        <button type="button" onClick="{{ closeCommit }}" style="width: 100%; padding: 12px; border-radius: 999px; border: 0; background: var(--accent); color: #08111f; font-size: 14px; font-weight: 600; cursor: pointer;">Got it</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <main style="min-width: 0; padding: clamp(22px, 3.4vw, 46px) clamp(18px, 3.4vw, 44px) 90px;">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 26px;">
+      <div style="min-width: 0;">
+        <sc-if value="{{ inEditor }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ closeEditor }}" style="margin-bottom: 12px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #a8a49c; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">← All work</button>
+        </sc-if>
+        <h1 style="margin: 0 0 6px; font-size: clamp(22px, 2.6vw, 30px); font-weight: 500; letter-spacing: -.03em;">{{ pageTitle }}</h1>
+        <p style="margin: 0; font-size: 13.5px; color: #8b8880;">{{ pageSub }}</p>
+        <sc-if value="{{ inEditor }}" hint-placeholder-val="{{ false }}">
+          <a href="{{ entryHref }}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 9px; font-size: 12.5px; color: var(--accent); border-bottom: 1px solid var(--edge);">Open this case study ↗</a>
+        </sc-if>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <button type="button" onClick="{{ doExport }}" style="padding: 9px 15px; border-radius: 999px; border: 1px solid var(--edge); background: var(--ink); color: var(--body-copy); font-size: 13px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Download content.json</button>
+        <button type="button" onClick="{{ doPublish }}" style="{{ publishStyle }}">{{ publishLabel }}</button>
+        <span style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px; border: 1px solid rgba(110,163,255,.35); background: rgba(110,163,255,.08); font-size: 13px; color: var(--accent);">{{ savedLabel }}</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ needsSite }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 16px; padding: 15px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
+        <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">Open the portfolio once so the panel can read its current copy — until then text fields have nothing to load.</p>
+        <a href="index.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isContent }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 900px;">
+        <sc-for list="{{ homeGroups }}" as="g" hint-placeholder-count="5">
+          <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; overflow: hidden;">
+            <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--edge);">
+              <span style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #cfe0ff;">{{ g.title }}</span>
+              <span style="font-size: 12px; color: #6b6862;">{{ g.note }}</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px 18px;">
+              <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="3">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px;">
+                    <span style="font-size: 12.5px; color: #a8a49c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ f.label }}</span>
+                    <button type="button" onClick="{{ f.reset }}" style="flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #6b6862; font-size: 11px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Revert</button>
+                  </div>
+                  <sc-if value="{{ f.media }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 10px; border: 1px dashed var(--edge); background: #0c1017;">
+                      <span style="flex: none; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #a8a49c; font-size: 12.5px;">{{ f.typeLabel }}</span>
+                      <input onInput="{{ f.onInput }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" style="flex: 1; min-width: 180px; box-sizing: border-box; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 12.5px;">
+                      <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo</button>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ f.text }}" hint-placeholder-val="{{ true }}">
+                    <div class="rt-wrap">
+              <div class="rt-bar">
+                <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+                <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+                <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+                <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+                <span class="sep"></span>
+                <select onChange="{{ rtFont }}" value="" title="Typeface">
+                  <option value="">Font</option>
+                  <option value="heading">Google Sans Flex</option>
+                  <option value="body">Google Sans Flex · body</option>
+                  <option value="accent">Google Sans Flex · light accent</option>
+                </select>
+                <select onChange="{{ rtWeight }}" value="" title="Font weight">
+                  <option value="">Weight</option>
+                  <option value="400">Regular</option>
+                  <option value="500">Medium</option>
+                  <option value="600">Semibold</option>
+                  <option value="700">Bold</option>
+                </select>
+                <span class="sep"></span>
+                <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+                <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent" style="background: #f2f0ed;"></button>
+                <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #8b8880;"></button>
+                <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+                <span class="sep"></span>
+                <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+              </div>
+              <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+            </div>
+                  </sc-if>
+                  <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
+                    <p style="margin: 7px 0 0; font-size: 11.5px; color: #6b6862;">{{ f.hint }}</p>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <button type="button" onClick="{{ resetAllText }}" style="align-self: start; margin-top: 2px; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255,120,120,.3); background: transparent; color: #ff9a9a; font-size: 13px; cursor: pointer;" style-hover="border-color: #ff9a9a;">Revert all copy to defaults</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isWorkList }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 26px; max-width: 1000px;">
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+          <section>
+            <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <h2 style="margin: 0 0 5px; font-size: 16px; font-weight: 500; letter-spacing: -.015em;">{{ sec.title }}</h2>
+                <p style="margin: 0; font-size: 12.5px; color: #6b6862;">{{ sec.note }}</p>
+              </div>
+              <button type="button" onClick="{{ sec.add }}" style="flex: none; padding: 8px 15px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: var(--accent); font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent);">+ Add entry</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ sec.items }}" as="c" hint-placeholder-count="2">
+                <div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--edge); background: var(--ink); border-radius: 14px; transition: border-color .2s;" style-hover="border-color: rgba(110,163,255,.4);">
+                  <div style="flex: none; width: 62px; height: 44px; border-radius: 8px; background: #141413 center/cover no-repeat; background-image: {{ c.thumbCss }};"></div>
+                  <button type="button" onClick="{{ c.edit }}" style="flex: 1; min-width: 0; text-align: left; background: transparent; border: 0; cursor: pointer; color: inherit; padding: 0;">
+                    <span style="display: block; font-size: 14.5px; font-weight: 500; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.title }}</span>
+                    <span style="display: block; font-size: 12px; color: #6b6862; margin-top: 3px;">{{ c.meta }}</span>
+                  </button>
+                  <div style="flex: none; display: flex; gap: 6px;">
+                    <button type="button" onClick="{{ c.up }}" title="Move up" style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #a8a49c; cursor: pointer;">↑</button>
+                    <button type="button" onClick="{{ c.down }}" title="Move down" style="width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #a8a49c; cursor: pointer;">↓</button>
+                    <a href="{{ c.caseHref }}" target="_blank" rel="noopener" title="Open this case study" style="display: inline-flex; align-items: center; padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); color: #e2dfda; font-size: 12.5px;" style-hover="border-color: var(--accent); color: var(--accent);">Open ↗</a>
+                    <button type="button" onClick="{{ c.edit }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #e2dfda; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">Edit</button>
+                    <button type="button" onClick="{{ c.dup }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: transparent; color: #e2dfda; font-size: 12.5px; cursor: pointer;" style-hover="border-color: var(--accent); color: var(--accent);">Duplicate</button>
+                    <button type="button" onClick="{{ c.remove }}" style="padding: 0 13px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,120,120,.28); background: transparent; color: #ff9a9a; font-size: 12.5px; cursor: pointer;">Delete</button>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; padding: 16px; border: 1px dashed var(--edge); border-radius: 14px; font-size: 12.5px; color: #6b6862;">Nothing in this section yet.</p>
+              </sc-if>
+            </div>
+          </section>
+        </sc-for>
+        <button type="button" onClick="{{ resetCases }}" style="align-self: start; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255,120,120,.3); background: transparent; color: #ff9a9a; font-size: 13px; cursor: pointer;">Restore original list</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ inEditor }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 900px;">
+
+        <div style="display: inline-flex; align-self: start; gap: 4px; padding: 5px; border-radius: 999px; border: 1px solid var(--edge); background: var(--ink);">
+          <button type="button" onClick="{{ tabCard }}" style="{{ tabCardStyle }}">Card</button>
+          <button type="button" onClick="{{ tabPage }}" style="{{ tabPageStyle }}">Case study page</button>
+        </div>
+
+        <sc-if value="{{ onCard }}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; padding: 18px; border: 1px solid var(--edge); background: var(--ink); border-radius: 16px;">
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Title</span><input onInput="{{ e.setTitle }}" value="{{ e.title }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Meta line — shown under the card title</span><input onInput="{{ e.setTag }}" value="{{ e.tag }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Page address — #/works/<span style="color: #a8a49c;">{{ e.slug }}</span></span><input onInput="{{ e.setSlug }}" value="{{ e.slug }}" placeholder="my-project" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;"></label>
+            <label style="display: flex; align-items: center; gap: 10px; align-self: end; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; cursor: pointer;">
+              <input type="checkbox" onChange="{{ e.setSoon }}" checked="{{ e.soon }}" style="width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer;">
+              <span style="font-size: 13px; color: #e2dfda;">Coming soon — card shows a badge and doesn&rsquo;t open</span>
+            </label>
+            <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Section</span>
+              <select onChange="{{ e.setGroup }}" value="{{ e.group }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;">
+                <option value="cases">Case Studies</option>
+                <option value="live">Live Products</option>
+                <option value="labs">MVPs &amp; Experiments</option>
+              </select>
+            </label>
+            <sc-if value="{{ canPickLayout }}" hint-placeholder-val="{{ false }}">
+              <label style="display: block;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Page layout</span>
+                <select onChange="{{ e.setLayout }}" value="{{ e.layout }}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;">
+                  <option value="">Card only — no detail page</option>
+                  <option value="longform">Long-form case study</option>
+                  <option value="mvp">MVP / experiment</option>
+                </select>
+              </label>
+            </sc-if>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Card thumbnail — shown on the work list</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <input onInput="{{ e.setImg }}" value="{{ e.img }}" placeholder="uploads/cover.jpg" style="flex: 1; min-width: 200px; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 13.5px;">
+                <button type="button" onClick="{{ e.uploadImg }}" style="flex: none; padding: 10px 16px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo</button>
+              </div></label>
+            <label style="display: block; grid-column: 1 / -1;"><span style="display: block; font-size: 11.5px; color: #6b6862; margin-bottom: 6px;">Card description</span><div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Google Sans Flex</option>
+        <option value="body">Google Sans Flex · body</option>
+        <option value="accent">Google Sans Flex · light accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #f2f0ed;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #8b8880;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="One or two lines about this project…" ref="{{ e.bodyRef }}" onInput="{{ e.bodyInput }}"></div>
+  </div></label>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ onPage }}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #6b6862;">{{ formatNote }}</p>
+
+          <sc-for list="{{ pageGroups }}" as="g" hint-placeholder-count="3">
+            <div style="border: 1px solid var(--edge); background: var(--ink); border-radius: 16px; overflow: hidden;">
+              <div style="padding: 13px 18px; border-bottom: 1px solid var(--edge); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #6b6862;">{{ g.title }}</div>
+              <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px 18px;">
+                <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="3">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px;">
+                      <span style="font-size: 12px; color: #a8a49c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ f.label }}</span>
+                      <button type="button" onClick="{{ f.reset }}" style="flex: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--edge); background: transparent; color: #6b6862; font-size: 11px; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Revert</button>
+                    </div>
+                    <sc-if value="{{ f.media }}" hint-placeholder-val="{{ false }}">
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 10px; border: 1px dashed var(--edge); background: #0c1017;">
+                        <sc-if value="{{ f.noSelect }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex: none; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #a8a49c; font-size: 12.5px;">{{ f.typeLabel }}</span>
+                        </sc-if>
+                        <sc-if value="{{ f.hasSelect }}" hint-placeholder-val="{{ true }}">
+                          <select onChange="{{ f.setType }}" value="{{ f.type }}" style="flex: none; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 12.5px;">
+                            <option value="image">Photo</option>
+                            <option value="video">Video</option>
+                          </select>
+                        </sc-if>
+                        <input onInput="{{ f.onInput }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" style="flex: 1; min-width: 180px; box-sizing: border-box; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--edge); background: #0e0e0d; color: #e9eaee; font-size: 12.5px;">
+                        <sc-if value="{{ canUpload }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo / video</button>
+                        </sc-if>
+                        <sc-if value="{{ f.isVideo }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex: none; padding: 4px 9px; border-radius: 999px; background: rgba(110,163,255,.14); color: #cfe0ff; font-size: 11px;">autoplay · loop · muted</span>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ f.text }}" hint-placeholder-val="{{ true }}">
+                      <div class="rt-wrap">
+    <div class="rt-bar">
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtBold }}" title="Bold" style="font-weight: 700;">B</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtItalic }}" title="Italic" style="font-style: italic; font-family: Georgia, serif;">I</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtUnderline }}" title="Underline" style="text-decoration: underline;">U</button>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtStrike }}" title="Strikethrough" style="text-decoration: line-through;">S</button>
+      <span class="sep"></span>
+      <select onChange="{{ rtFont }}" value="" title="Typeface">
+        <option value="">Font</option>
+        <option value="heading">Google Sans Flex</option>
+        <option value="body">Google Sans Flex · body</option>
+        <option value="accent">Google Sans Flex · light accent</option>
+      </select>
+      <select onChange="{{ rtWeight }}" value="" title="Font weight">
+        <option value="">Weight</option>
+        <option value="400">Regular</option>
+        <option value="500">Medium</option>
+        <option value="600">Semibold</option>
+        <option value="700">Bold</option>
+      </select>
+      <span class="sep"></span>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtWhite }}" title="White" style="background: #ffffff;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtBlue }}" title="Accent blue" style="background: #f2f0ed;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtGrey }}" title="Body grey" style="background: #8b8880;"></button>
+      <button type="button" class="rt-sw" onMouseDown="{{ rtHold }}" onClick="{{ rtMuted }}" title="Muted grey" style="background: #75798c;"></button>
+      <span class="sep"></span>
+      <button type="button" onMouseDown="{{ rtHold }}" onClick="{{ rtClearFmt }}" title="Remove all formatting">Clear</button>
+    </div>
+    <div class="rt" contenteditable="true" data-ph="Type here…" ref="{{ f.rtRef }}" onInput="{{ f.rtInput }}"></div>
+  </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ needsReload }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
+              <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">This page's fields load from the site itself. Open the portfolio once (or reload it if it's already open), then come back.</p>
+              <a href="index.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noPageFields }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; padding: 18px; border: 1px dashed var(--edge); border-radius: 14px; font-size: 13px; line-height: 1.6; color: #8b8880;">This entry has no case-study page built yet — only its card shows on the site. The card fields above are all that's editable.</p>
+          </sc-if>
+        </sc-if>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+const SECTION_META = [
+  { key: "cases", title: "Case Studies", note: "Long-form format — narrative sections, quote, impact stats." },
+  { key: "live", title: "Live Products", note: "Product format — stat headline, fact rail, impact cards, NDA close." },
+  { key: "labs", title: "MVPs & Experiments", note: "MVP format — research steps, screen grid, features, learnings." }
+];
+const SECTION_NAME = { cases: "Case Studies", live: "Live Products", labs: "MVPs & Experiments" };
+
+/* Page layouts and how each one's fields are sourced. */
+const LAYOUT = {
+  longform: { kind: "prefix", prefix: "ws", label: "Long-form case study", note: "Long-form case-study layout. Fields are in page order, top to bottom." },
+  mvp: { kind: "prefix", prefix: "bu", label: "MVP / experiment", note: "MVP layout. Fields are in page order, top to bottom." },
+  product: { kind: "data", label: "Live product", note: "Product layout — structured fields map to the page's blocks." }
+};
+const NATIVE_FORMAT = { workspace: "longform", buseit: "mvp", kriyam: "product", proteger: "product", goodbook: "product" };
+function layoutKey(entry) {
+  if (!entry) return null;
+  return entry.format || NATIVE_FORMAT[entry.source || entry.id] || null;
+}
+
+/* Structured schema for the data-driven product format. */
+const DATA_SCHEMA = [
+  { title: "Header", fields: [
+    { path: "statLead", label: "Stat (accent)", rows: 1 },
+    { path: "statRest", label: "Headline remainder", rows: 2 },
+    { path: "lede", label: "Standfirst", rows: 3 },
+    { path: "heroSrc", label: "Hero media", rows: 1, hint: "Photo or video path — .mp4 plays as video" }
+  ] },
+  { title: "Fact rail", repeat: "facts", of: [
+    { path: "k", label: "Label", rows: 1 },
+    { path: "v", label: "Value", rows: 2 }
+  ] },
+  { title: "Impact cards", repeat: "impact", of: [
+    { path: "h", label: "Heading", rows: 1 },
+    { path: "p", label: "Body", rows: 3 },
+    { path: "src", label: "Card media", rows: 1 }
+  ] },
+  { title: "Outcome", fields: [{ path: "outcomeSrc", label: "Outcome media", rows: 1 }] },
+  { title: "Project overview", repeat: "overview", scalar: true, label: "Paragraph", rows: 4 },
+  { title: "Role & team", repeat: "role", scalar: true, label: "Paragraph", rows: 4 },
+  { title: "Close", fields: [{ path: "clientsLabel", label: "Clients heading", rows: 1 }] }
+];
+
+function slugify(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+const SEED = [
+  { id: "kriyam", title: "Built for trust. Designed for scale.", tag: "BFSI · Web & Mobile", img: "uploads/Kriyam%20Mockup.jpg", groups: ["live"], slug: "built-for-trust-designed-for-scale", body: "Kriyam.ai brings order to insurance's most vulnerable touchpoint — field verification. Ad-hoc processes replaced with a secure, auditable platform." },
+  { id: "proteger", title: "Building tomorrow's smart factories", tag: "Manufacturing · Web & Tablet", img: "uploads/391985742_854c309b-66af-4b9a-a203-12cf7fae41dc%202.jpg", groups: ["live"], slug: "building-tomorrow-s-smart-factories", body: "End-to-end operational intelligence for manufacturers. Designed with factory workers on the floor, built for speed on a shared tablet." },
+  { id: "goodbook", title: "Attendance, payroll and HR — beautifully simple", tag: "Enterprise HR · Web & Mobile", img: "uploads/138817034_9b8cfbdd-ec88-42cb-af03-f4cdb9f0cff3.jpg", groups: ["live"], slug: "attendance-payroll-and-hr-beautifully-simple", body: "From check-in to payslip in one place. A platform people are forced to open, redesigned so they don't hate opening it." },
+  { id: "workspace", title: "WorkSpace", tag: "Case study · Product design", img: "uploads/Case%20cover.jpg", groups: ["cases"], slug: "workspace", body: "Letting every client run cases their own way — reshaping the app around how teams already work, instead of teaching them ours." },
+  { id: "buseit", title: "Buy it. Use it. Sell it.", tag: "C2C · iOS & Android", img: "uploads/b2.png", groups: ["labs"], slug: "buy-it-use-it-sell-it", body: "A trust-first resale marketplace designed to remove fraud, friction and fear from second-hand commerce in India." }
+];
+
+class Component extends DCLogic {
+  state = { page: "content", editing: null, editTab: "card", saved: "", tick: 0 };
+
+  componentDidMount() {
+    /* The panel always edits the draft copy, never what visitors are served. */
+    if (window.CMS) window.CMS.enterDraftMode();
+    document.addEventListener("selectionchange", this.rtRemember);
+    /* Pasted content comes in as plain text everywhere — pasted spans were leaking
+       caret-color/font-family junk into the saved copy. */
+    this.onPaste = (e) => {
+      const host = e.target && e.target.closest && e.target.closest(".rt");
+      if (!host) return;
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+      document.execCommand("insertText", false, text);
+    };
+    document.addEventListener("paste", this.onPaste, true);
+    this.off = window.CMS && window.CMS.onChange(() => this.setState((s) => ({ tick: s.tick + 1 })));
+    /* Heal any card copy a paste already polluted with markup. */
+    if (window.CMS) {
+      const rows = window.CMS.projects() || [];
+      const strip = (v) => String(v == null ? "" : v).replace(/<br\s*\/?>/gi, " ").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+      let dirty = false;
+      const healed = rows.map((p) => {
+        const next = { ...p };
+        ["title", "tag", "body"].forEach((k) => {
+          if (typeof p[k] === "string" && /<[a-z/!]/i.test(p[k])) { next[k] = strip(p[k]); dirty = true; }
+        });
+        return next;
+      });
+      if (dirty) window.CMS.saveProjects(healed);
+    }
+    /* Shipped case copy comes from the shared file, so the editor has real values
+       even if the site has never been opened in this browser. */
+    if (window.CMS && window.CASES_V2) window.CMS.setCaseDefaults(window.CASES_V2);
+    if (window.CMS && !(window.CMS.projects() || []).length) window.CMS.saveProjects(SEED.map((p) => ({ ...p })));
+    /* Cards now render from this store, so bring pre-redesign entries up to the shipped tags/slugs. */
+    if (window.CMS) {
+      const saved = window.CMS.projects() || [];
+      let changed = false;
+      const next = saved.map((p) => {
+        const seed = SEED.filter((s) => s.id === p.id)[0];
+        if (!seed) return p;
+        const patch = { ...p };
+        if (!p.slug) { patch.slug = seed.slug; changed = true; }
+        if (p.tag !== seed.tag && p.tagEdited !== true) { patch.tag = seed.tag; changed = true; }
+        return patch;
+      });
+      if (changed) window.CMS.saveProjects(next);
+    }
+    /* Pull every editable field out of the site's source so no page visit is needed. */
+    /* Home page and case studies are one file now — one harvest covers both. */
+    if (window.CMS) window.CMS.harvestFromSource("index.html")
+      .then(() => this.setState((s) => ({ tick: s.tick + 1 })));
+  }
+  componentWillUnmount() {
+    if (this.off) this.off();
+    document.removeEventListener("selectionchange", this.rtRemember);
+    document.removeEventListener("paste", this.onPaste, true);
+  }
+
+  /* Opens the OS file picker, sends the file to the server, hands back its path. */
+  pickFile(done) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*,video/mp4,video/webm,video/quicktime";
+    input.onchange = () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      this.flash("Uploading…");
+      window.CMS.upload(file).then((path) => {
+        if (!path) { this.flash("Upload failed"); return; }
+        done(path);
+        /* A data: URL means there was no server to write /uploads on. */
+        this.flash(/^data:/.test(path) ? "Added (local preview)" : "Uploaded to /uploads");
+      });
+    };
+    input.click();
+  }
+
+  dirty() {
+    try { return !!localStorage.getItem("akash.cms.dirty"); } catch (e) { return false; }
+  }
+
+  /* --- rich text -------------------------------------------------------
+     A contenteditable per field. The toolbar acts on the live selection, so
+     buttons must never take focus (mousedown is prevented in the template). */
+  rtExec(cmd, val) {
+    try { document.execCommand("styleWithCSS", false, true); } catch (e) {}
+    document.execCommand(cmd, false, val || null);
+    this.rtCommit();
+  }
+  /* Wrap the selection in a span carrying one CSS property. */
+  rtStyle(prop, value) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.style[prop] = value;
+    try {
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      sel.removeAllRanges();
+      const r = document.createRange();
+      r.selectNodeContents(span);
+      sel.addRange(r);
+    } catch (e) {}
+    this.rtCommit();
+  }
+  /* The serif accent used across the site, applied as one action. */
+  rtAccentFont() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const span = document.createElement("span");
+    span.className = "em";
+    span.style.fontFamily = "'Google Sans Flex', system-ui, sans-serif";
+    span.style.fontStyle = "normal";
+    span.style.fontWeight = "300";
+    try { span.appendChild(range.extractContents()); range.insertNode(span); } catch (e) {}
+    this.rtCommit();
+  }
+  rtClear() {
+    try { document.execCommand("removeFormat"); } catch (e) {}
+    const host = this.rtHost();
+    if (host) host.querySelectorAll("span.em").forEach((s) => s.replaceWith(...s.childNodes));
+    this.rtCommit();
+  }
+  /* Toolbar clicks land outside the editor, so the last in-editor selection is
+     remembered and restored before any command runs. */
+  rtRemember = () => {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const n = sel.anchorNode;
+    const el = n && (n.nodeType === 1 ? n : n.parentElement);
+    if (el && el.closest && el.closest(".rt")) this.savedRange = sel.getRangeAt(0).cloneRange();
+  };
+  rtRestore() {
+    if (this.rtHost()) return true;
+    if (!this.savedRange) return false;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(this.savedRange);
+    const host = this.rtHost();
+    if (host) host.focus();
+    return !!host;
+  }
+  /* Plain-text variant: the site renders card copy as text, so tags must never
+     reach the store — a paste from Word/Figma/a browser arrives full of spans. */
+  plainBind(getValue, save) {
+    const strip = (v) => String(v == null ? "" : v)
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return {
+      rtRef: (el) => {
+        if (!el) return;
+        el._save = (v) => save(strip(v));
+        el._plain = true;
+        const want = strip(getValue());
+        if (el._loaded !== want && document.activeElement !== el) {
+          el.textContent = want;
+          el._loaded = want;
+        }
+      },
+      rtInput: (e) => { const v = e.target.innerText; e.target._loaded = v; save(strip(v)); this.flash("Saved"); }
+    };
+  }
+
+  /* Build a field's editor bindings: load once, save on every keystroke. */
+  rtBind(getValue, save) {
+    return {
+      rtRef: (el) => {
+        if (!el) return;
+        el._save = save;
+        const want = getValue();
+        if (el._loaded !== want && document.activeElement !== el) {
+          el.innerHTML = want || "";
+          el._loaded = want;
+        }
+      },
+      rtInput: (e) => { const v = e.target.innerHTML; e.target._loaded = v; save(v); this.flash("Saved"); }
+    };
+  }
+
+  rtHost() {
+    const n = window.getSelection && window.getSelection().anchorNode;
+    if (!n) return null;
+    const el = n.nodeType === 1 ? n : n.parentElement;
+    return el && el.closest ? el.closest(".rt") : null;
+  }
+  /* Push the edited HTML back into the draft store. */
+  rtCommit() {
+    const host = this.rtHost();
+    if (!host || !host._save) return;
+    host._save(host.innerHTML);
+    this.flash("Saved");
+  }
+
+  flash(msg) {
+    this.setState({ saved: msg });
+    clearTimeout(this.fl);
+    this.fl = setTimeout(() => this.setState({ saved: "" }), 1600);
+  }
+  navStyle(p) {
+    const on = this.state.page === p;
+    return "text-align: left; padding: 10px 12px; border-radius: 10px; border: 0; cursor: pointer; font-size: 13.5px; transition: background .2s, color .2s;"
+      + (on ? "background: rgba(110,163,255,.14); color: #cfe0ff; font-weight: 500;" : "background: transparent; color: #8b8880;");
+  }
+  pillStyle(on) {
+    return "padding: 8px 16px; border-radius: 999px; border: 0; cursor: pointer; font-size: 13px; transition: background .2s, color .2s;"
+      + (on ? "background: rgba(110,163,255,.16); color: #cfe0ff; font-weight: 500;" : "background: transparent; color: #8b8880;");
+  }
+
+  list() { return (window.CMS && window.CMS.projects()) || []; }
+  write(next) { window.CMS.saveProjects(next); this.flash("Saved"); }
+  patch(id, key, value) { this.write(this.list().map((p) => (p.id === id ? { ...p, [key]: value } : p))); }
+  move(id, dir) {
+    const l = this.list().slice();
+    const i = l.findIndex((p) => p.id === id);
+    if (i < 0) return;
+    const group = (l[i].groups || ["live"])[0];
+    /* Find the neighbour inside the same section, not just the next array slot. */
+    let j = -1;
+    for (let k = i + dir; k >= 0 && k < l.length; k += dir) {
+      if ((l[k].groups || ["live"])[0] === group) { j = k; break; }
+    }
+    if (j < 0) return;
+    const t = l[i]; l[i] = l[j]; l[j] = t;
+    this.write(l);
+  }
+
+  /* Long-form formats: fields derive from the site's data-cms snapshot. */
+  prefixGroups(prefix, ns) {
+    const derived = window.CMS ? window.CMS.derivedFields(prefix) : [];
+    const defs = window.CMS ? window.CMS.defaults() : {};
+    const out = [];
+    const mdefs = window.CMS ? window.CMS.mediaDefaults() : {};
+    derived.forEach((f) => {
+      /* Each heading in the page starts a new group, named after that heading. */
+      if (f.kind === "text" && (f.tag === "h1" || f.tag === "h2" || f.tag === "h3")) {
+        out.push({ title: f.label, fields: [] });
+      }
+      if (!out.length) out.push({ title: "Intro", fields: [] });
+
+      if (f.kind === "media") {
+        const ov = window.CMS.mediaFor(f.key, ns) || {};
+        const def = mdefs[f.key] || {};
+        const setSrc = (src) => {
+          window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : "image", src });
+          this.flash("Saved");
+        };
+        out[out.length - 1].fields.push({
+          upload: () => this.pickFile(setSrc),
+          media: true, text: false, rows: 1, noSelect: false, hasSelect: true, typeLabel: "",
+          label: f.label || "Media",
+          type: ov.type || def.type || "image",
+          isVideo: (ov.type || def.type) === "video",
+          value: ov.src !== undefined && ov.src !== "" ? ov.src : (def.src || ""),
+          placeholder: "uploads/file." + ((ov.type || def.type) === "video" ? "mp4" : "jpg"),
+          setType: (e) => {
+            const cur = window.CMS.mediaFor(f.key, ns) || def;
+            window.CMS.setMedia(f.key, ns, { type: e.target.value, src: cur.src || "" });
+            this.flash("Saved");
+          },
+          onInput: (e) => {
+            const t = (window.CMS.mediaFor(f.key, ns) || def).type || "image";
+            const src = e.target.value;
+            window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : t, src });
+            this.flash("Saved");
+          },
+          reset: () => { window.CMS.setMedia(f.key, ns, null); this.flash("Reverted"); }
+        });
+        return;
+      }
+
+      out[out.length - 1].fields.push({
+        text: true, media: false,
+        label: (f.tag === "p" ? "" : f.tag.toUpperCase() + " · ") + f.label,
+        rows: f.tag === "p" ? 4 : 2,
+        value: (() => {
+          const v = window.CMS.lookup(f.key, ns);
+          return v === undefined ? (defs[f.key] || "") : v;
+        })(),
+        ...this.rtBind(
+          () => { const v = window.CMS.lookup(f.key, ns); return v === undefined ? (window.CMS.defaults()[f.key] || "") : v; },
+          (v) => window.CMS.setText(window.CMS.nsKey(f.key, ns), v)
+        ),
+        reset: () => { window.CMS.setText(window.CMS.nsKey(f.key, ns), null); this.flash("Reverted"); }
+      });
+    });
+    return out;
+  }
+
+  /* Product format: fields read/write the per-case detail object. */
+  dataGroups(id, sourceKey) {
+    const ov = window.CMS ? window.CMS.detail(id) : {};
+    const shipped = window.CASES_V2 || {};
+    const base = (window.CMS ? window.CMS.caseDefaults()[id] : null) || shipped[sourceKey] || shipped[id] || {};
+    const get = (path) => {
+      const parts = path.split(".");
+      let a = ov, b = base;
+      for (const k of parts) { a = a && typeof a === "object" ? a[k] : undefined; b = b && typeof b === "object" ? b[k] : undefined; }
+      /* Empty override means "not overridden" — same rule the site applies. */
+      if (a !== undefined && a !== null && a !== "") return a;
+      return b !== undefined && b !== null ? b : "";
+    };
+    const isMediaPath = (path) => /(^|\.)(heroSrc|outcomeSrc|src)$/.test(path);
+    const field = (path, label, rows) => (isMediaPath(path) ? {
+      media: true, text: false, rows: 1, label, noSelect: true, hasSelect: false,
+      upload: () => this.pickFile((src) => { window.CMS.setDetail(id, path, src); this.flash("Saved"); }),
+      type: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "video" : "image",
+      isVideo: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")),
+      typeLabel: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "Video" : "Photo",
+      placeholder: "uploads/file.jpg or uploads/clip.mp4",
+      value: String(get(path) || ""),
+      setType: () => {},
+      onInput: (e) => { window.CMS.setDetail(id, path, e.target.value); this.flash("Saved"); },
+      reset: () => { window.CMS.setDetail(id, path, null); this.flash("Reverted"); }
+    } : {
+      text: true, media: false,
+      label, rows: rows || 2,
+      value: String(get(path) || ""),
+      ...this.rtBind(() => String(get(path) || ""), (v) => window.CMS.setDetail(id, path, v)),
+      reset: () => { window.CMS.setDetail(id, path, null); this.flash("Reverted"); }
+    });
+
+    return DATA_SCHEMA.map((g) => {
+      if (!g.repeat) return { title: g.title, fields: g.fields.map((f) => field(f.path, f.label, f.rows)) };
+      const count = Math.max(
+        (base[g.repeat] || []).length,
+        (ov[g.repeat] || []).length,
+        1
+      );
+      const fields = [];
+      for (let i = 0; i < count; i++) {
+        if (g.scalar) fields.push(field(g.repeat + "." + i, g.label + " " + (i + 1), g.rows));
+        else g.of.forEach((f) => fields.push(field(g.repeat + "." + i + "." + f.path, (i + 1) + " · " + f.label, f.rows)));
+      }
+      return { title: g.title, fields };
+    });
+  }
+
+  /* Home page fields, grouped exactly as the site's sections read top to bottom.
+     Selected work is intentionally absent — the Work tab owns those cards. */
+  homeGroups() {
+    const C = window.CMS;
+    if (!C) return [];
+    const defs = C.defaults();
+    const over = C.text();
+    const secs = C.HOME_SECTIONS || [];
+    const textField = (f) => ({
+      text: true, media: false,
+      label: f.label,
+      hasHint: !!f.hint,
+      hint: f.hint || "",
+      value: Object.prototype.hasOwnProperty.call(over, f.key) ? over[f.key] : (defs[f.key] || ""),
+      ...this.rtBind(
+        () => (Object.prototype.hasOwnProperty.call(C.text(), f.key) ? C.text()[f.key] : (C.defaults()[f.key] || "")),
+        (v) => { if (Object.keys(C.defaults()).length) C.setText(f.key, v); }
+      ),
+      reset: () => { C.setText(f.key, null); this.flash("Reverted"); }
+    });
+    const mediaField = (key, label) => {
+      const ov = C.mediaFor(key) || {};
+      const def = C.mediaDefaults()[key] || {};
+      const src = ov.src !== undefined && ov.src !== "" ? ov.src : (def.src || "");
+      const set = (v) => { C.setMedia(key, null, { type: /\.(mp4|webm|mov)$/i.test(v) ? "video" : "image", src: v }); this.flash("Saved"); };
+      return {
+        media: true, text: false, hasHint: false, hint: "",
+        label, typeLabel: /\.(mp4|webm|mov)$/i.test(src) ? "Video" : "Photo",
+        value: src, placeholder: "uploads/photo.jpg",
+        upload: () => this.pickFile(set),
+        onInput: (e) => set(e.target.value),
+        reset: () => { C.setMedia(key, null, null); this.flash("Reverted"); }
+      };
+    };
+    return secs.map((sec) => {
+      const fields = (C.FIELDS || []).filter((f) => f.group === sec.group).map(textField);
+      if (sec.group === "Hero") fields.unshift(mediaField("home.photo", "Portrait photo"));
+      return { title: sec.title, note: sec.note, fields };
+    }).filter((g) => g.fields.length);
+  }
+
+  renderVals() {
+    /* Idempotent, and re-asserted here so a hot reload can't drop the panel
+       back into writing straight to the published copy. */
+    if (window.CMS) window.CMS.enterDraftMode();
+    const page = this.state.page;
+    const editing = this.state.editing;
+    const defs = window.CMS ? window.CMS.defaults() : {};
+    const over = window.CMS ? window.CMS.text() : {};
+    const items = this.list();
+    const entry = editing ? items.find((p) => p.id === editing) : null;
+    const lk = layoutKey(entry);
+    const fmt = lk ? LAYOUT[lk] : null;
+    const R = (window.CMS && window.CMS.remote) || { available: false, admin: false };
+
+    const pageGroups = !entry ? [] : (fmt && fmt.kind === "prefix") ? this.prefixGroups(fmt.prefix, entry.id)
+      : (fmt && fmt.kind === "data") ? this.dataGroups(entry.id, entry.source || entry.id) : [];
+
+    const titles = {
+      content: ["Home page", "Edits are saved as a draft. Nothing changes on the live site until you press Publish."],
+      work: ["Work", "The three tabs of Selected work. Edits stay in draft until you press Publish."],
+    };
+
+    return {
+      pageTitle: entry ? entry.title : titles[page][0],
+      pageSub: entry ? (SECTION_NAME[(entry.groups || ["live"])[0]] + " · " + (entry.tag || "")) : titles[page][1],
+      rtHold: (e) => e.preventDefault(),
+      rtBold: () => { this.rtRestore() && this.rtExec("bold"); },
+      rtItalic: () => { this.rtRestore() && this.rtExec("italic"); },
+      rtUnderline: () => { this.rtRestore() && this.rtExec("underline"); },
+      rtStrike: () => { this.rtRestore() && this.rtExec("strikeThrough"); },
+      rtWhite: () => { this.rtRestore() && this.rtStyle("color", "#ffffff"); },
+      rtBlue: () => { this.rtRestore() && this.rtStyle("color", "var(--color-accent)"); },
+      rtGrey: () => { this.rtRestore() && this.rtStyle("color", "var(--body-copy)"); },
+      rtMuted: () => { this.rtRestore() && this.rtStyle("color", "var(--color-neutral-600)"); },
+      rtFont: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (!v || !this.rtRestore()) return;
+        if (v === "accent") this.rtAccentFont();
+        else this.rtStyle("fontFamily", v === "heading" ? "var(--font-heading)" : "var(--font-body)");
+      },
+      rtWeight: (e) => {
+        const v = e.target.value;
+        e.target.value = "";
+        if (v && this.rtRestore()) this.rtStyle("fontWeight", v);
+      },
+      rtClearFmt: () => { this.rtRestore() && this.rtClear(); },
+
+      savedLabel: this.state.saved || (R.available ? (this.dirty() ? "Unpublished changes" : "Published") : "Local"),
+      onServer: R.available,
+      canUpload: true,
+      needsLogin: R.available && !R.admin,
+      loginError: !!this.state.loginErr,
+      loginErrorText: this.state.loginErr || "",
+      setPw: (e) => { this.pw = e.target.value; },
+      doLogin: (e) => {
+        e.preventDefault();
+        window.CMS.login(this.pw || "").then((ok) => {
+          this.setState({ loginErr: ok ? "" : "Wrong password. Try again." });
+          if (ok) window.CMS.loadRemote();
+        });
+      },
+      doLogout: () => window.CMS.logout(),
+      publishLabel: R.saving ? "Publishing…"
+        : (R.error ? R.error
+        : (this.dirty() ? (R.available ? "Publish changes" : "Publish — get content.json") : "Nothing to publish")),
+      publishStyle: "padding: 9px 17px; border-radius: 999px; border: 0; font-size: 13px; font-weight: 600; cursor: pointer; "
+        + (this.dirty() && !R.saving
+          ? "background: var(--accent); color: #08111f;"
+          : "background: #182034; color: #6b6862;"),
+      doPublish: () => {
+        /* With a PHP backend this goes live instantly; on static hosting it
+           hands you the file to commit. */
+        if (R.available) {
+          window.CMS.publish().then((ok) => this.flash(ok ? "Published — live now" : "Publish failed"));
+          return;
+        }
+        window.CMS.publishFile();
+        this.setState({ showCommit: true });
+        this.flash("content.json downloaded");
+      },
+      closeCommit: () => this.setState({ showCommit: false }),
+      showCommit: !!this.state.showCommit,
+      doDiscard: () => {
+        if (!confirm("Throw away every edit made since the last publish?")) return;
+        window.CMS.discardDraft();
+        this.flash("Back to published");
+      },
+      doRestore: () => {
+        if (!confirm("Roll the live site back to the version published before the last one?")) return;
+        window.CMS.restoreLastPublish().then((ok) => this.flash(ok ? "Rolled back" : "Nothing to roll back"));
+      },
+
+      needsSite: !Object.keys(defs).length,
+      isContent: page === "content",
+      isWorkList: page === "work" && !editing,
+      inEditor: page === "work" && !!entry,
+      navContent: this.navStyle("content"),
+      navWork: this.navStyle("work"),
+      goContent: () => this.setState({ page: "content", editing: null }),
+      goWork: () => this.setState({ page: "work", editing: null }),
+      closeEditor: () => this.setState({ editing: null }),
+
+      homeGroups: this.homeGroups(),
+      fields: (window.CMS ? window.CMS.FIELDS : []).map((f) => ({
+        ...f,
+        hasHint: !!f.hint,
+        hint: f.hint || "",
+        rows: f.type === "area" || f.type === "rich" ? 3 : 2,
+        disabled: !Object.keys(defs).length,
+        value: Object.prototype.hasOwnProperty.call(over, f.key) ? over[f.key] : (defs[f.key] || ""),
+        ...this.rtBind(
+          () => (Object.prototype.hasOwnProperty.call(window.CMS.text(), f.key) ? window.CMS.text()[f.key] : (window.CMS.defaults()[f.key] || "")),
+          (v) => { if (Object.keys(window.CMS.defaults()).length) window.CMS.setText(f.key, v); }
+        ),
+        reset: () => { window.CMS.setText(f.key, null); this.flash("Reverted"); }
+      })),
+      resetAllText: () => { window.CMS.resetText(); this.flash("Reverted all"); },
+
+      sections: SECTION_META.map((sec) => {
+        const rows = items.filter((p) => (p.groups || ["live"])[0] === sec.key);
+        return {
+          title: sec.title,
+          note: sec.note,
+          empty: !rows.length,
+          add: () => {
+            const id = "new-" + Date.now().toString(36);
+            this.write(items.concat([{ id, title: "Untitled entry", tag: "Category · Platform", img: "", groups: [sec.key], slug: id, body: "One or two lines on what this project was." }]));
+            this.setState({ editing: id, editTab: "card" });
+          },
+          items: rows.map((p) => ({
+            ...p,
+            meta: (p.tag || "") + (p.soon ? " · coming soon" : ""),
+            caseHref: "index.html?preview=1#/works/" + (p.slug || slugify(p.title)),
+            thumbCss: p.img ? 'url("' + p.img + '")' : "none",
+            edit: () => this.setState({ editing: p.id, editTab: "card" }),
+            dup: () => {
+              const id = window.CMS.duplicate(p.id);
+              this.flash("Duplicated");
+              if (id) this.setState({ editing: id, editTab: "card" });
+            },
+            up: () => this.move(p.id, -1),
+            down: () => this.move(p.id, 1),
+            remove: () => { if (confirm("Remove “" + p.title + "” from the site?")) this.write(items.filter((x) => x.id !== p.id)); }
+          }))
+        };
+      }),
+      resetCases: () => { if (confirm("Restore the original five entries?")) { window.CMS.saveProjects(SEED.map((p) => ({ ...p }))); this.flash("Restored"); } },
+
+      onCard: this.state.editTab === "card",
+      onPage: this.state.editTab === "page",
+      tabCard: () => this.setState({ editTab: "card" }),
+      tabPage: () => this.setState({ editTab: "page" }),
+      tabCardStyle: this.pillStyle(this.state.editTab === "card"),
+      tabPageStyle: this.pillStyle(this.state.editTab === "page"),
+      entryHref: entry ? "index.html?preview=1#/works/" + (entry.slug || slugify(entry.title)) : "#",
+      formatNote: fmt ? fmt.note : "",
+      noPageFields: !!entry && !pageGroups.length && !(fmt && fmt.kind === "prefix"),
+      needsReload: !!entry && !pageGroups.length && !!(fmt && fmt.kind === "prefix"),
+      pageGroups,
+      e: entry ? {
+        ...entry,
+        group: (entry.groups || ["live"])[0],
+        setTitle: (ev) => {
+          const next = ev.target.value;
+          /* An untouched slug follows the title; a hand-written one is left alone. */
+          const auto = !entry.slug || entry.slug === slugify(entry.title);
+          const list = this.list().map((p) => (p.id === entry.id
+            ? { ...p, title: next, ...(auto ? { slug: slugify(next) } : {}) }
+            : p));
+          this.write(list);
+        },
+        setSlug: (ev) => this.patch(entry.id, "slug", slugify(ev.target.value)),
+        setTag: (ev) => this.patch(entry.id, "tag", ev.target.value),
+        ...(() => { const b = this.plainBind(() => entry.body || "", (v) => this.patch(entry.id, "body", v));
+          return { bodyRef: b.rtRef, bodyInput: b.rtInput }; })(),
+        uploadImg: () => this.pickFile((src) => this.patch(entry.id, "img", src)),
+        setImg: (ev) => this.patch(entry.id, "img", ev.target.value),
+        setGroup: (ev) => this.patch(entry.id, "groups", [ev.target.value]),
+        soon: !!entry.soon,
+        setSoon: (ev) => this.patch(entry.id, "soon", ev.target.checked),
+        layout: lk || "",
+        nativeLayout: !!NATIVE_FORMAT[entry.source || entry.id],
+        setLayout: (ev) => this.patch(entry.id, "format", ev.target.value || null)
+      } : { title: "", tag: "", body: "", img: "", slug: "", group: "live", layout: "", nativeLayout: true, soon: false },
+      layoutLabel: fmt ? fmt.label : "Card only",
+      canPickLayout: !!entry && !NATIVE_FORMAT[entry.source || entry.id],
+
+      doExport: () => {
+        /* Same payload publishing writes, so the downloaded file IS the site's content. */
+        window.CMS.publishFile();
+        this.flash("content.json downloaded");
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
