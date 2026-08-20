@@ -1,0 +1,12 @@
+{
+  "name": "itssky-build",
+  "private": true,
+  "type": "module",
+  "description": "Build-only tooling for itssky.co.in. Not part of the runtime site — used solely by the GitHub Actions workflow to produce a pre-rendered dist/ for deployment. The site itself still has zero build step for day-to-day editing.",
+  "scripts": {
+    "prerender": "node scripts/prerender.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.47.2"
+  }
+}
