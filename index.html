@@ -1374,7 +1374,23 @@ function idFromRoute(hash) {
   return hit ? hit.id : null;
 }
 
-const isVideoSrc = (s) => /\.(mp4|webm|mov)(\?|$)/i.test(String(s || ""));
+const isVideoSrc = (s) => /\.(mp4|webm|mov)(\?|$)/i.test(String(s || "")) || !!ytId(s);
+
+/* Accepts a watch URL, a youtu.be short link, an /embed/ URL, or a bare 11-char id. */
+function ytId(s) {
+  const v = String(s || "").trim();
+  if (!v) return null;
+  if (/^[\w-]{11}$/.test(v)) return v;
+  const m = v.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|shorts\/|live\/|watch\?(?:.*&)?v=))([\w-]{11})/i);
+  return m ? m[1] : null;
+}
+/* No enablejsapi/origin: on a sandboxed or opaque origin YouTube answers those with error 153.
+   Out-of-view playback is stopped by unloading the frame instead of the postMessage API. */
+function ytEmbed(id) {
+  return "https://www.youtube.com/embed/" + id +
+    "?autoplay=1&mute=1&controls=0&loop=1&playlist=" + id +
+    "&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0";
+}
 
 const CASE_ORDER = ["kriyam", "proteger", "goodbook", "buseit", "workspace"];
 
@@ -1448,7 +1464,11 @@ class Component extends DCLogic {
         });
       }, { threshold: 0.25 });
     }
-    document.querySelectorAll("video[data-autoplay-in-view]:not([data-observed])").forEach((v) => {
+    document.querySelectorAll("video[data-autoplay-in-view]").forEach((v) => {
+      const yid = ytId(v.getAttribute("data-vsrc"));
+      if (yid) { this.mountYT(v, yid); return; }
+      this.unmountYT(v);
+      if (v.hasAttribute("data-observed")) return;
       v.setAttribute("data-observed", "");
       v.muted = true;
       v.loop = true;
@@ -1460,6 +1480,81 @@ class Component extends DCLogic {
       }
       this.vio.observe(v);
     });
+  }
+
+  /* YouTube slots: the <video> stays in the DOM (CMS + React own it) but hides,
+     and a sibling wrapper carries a chromeless, looping, click-proof iframe. */
+  mountYT(v, id) {
+    const parent = v.parentElement;
+    if (!parent) return;
+    v.style.display = "none";
+    v.removeAttribute("src");
+    let wrap = parent.querySelector(":scope > [data-yt-wrap]");
+    if (wrap && wrap.getAttribute("data-yt-id") === id) {
+      /* Same video, but rebuild if the embed URL scheme changed under it. */
+      const cur = wrap.querySelector("iframe");
+      if (!cur || !cur.src || cur.src === ytEmbed(id)) return;
+    }
+    if (wrap) wrap.remove();
+
+    const boxed = /object-fit:\s*cover/i.test(v.getAttribute("style") || "");
+    wrap = document.createElement("div");
+    wrap.setAttribute("data-yt-wrap", "");
+    wrap.setAttribute("data-yt-id", id);
+    wrap.style.cssText = (v.getAttribute("style") || "") +
+      ";overflow:hidden;background:transparent;object-fit:unset;" +
+      (boxed ? "" : "position:relative;aspect-ratio:16/9;height:auto;width:100%;display:block;");
+
+    const frame = document.createElement("iframe");
+    frame.setAttribute("title", "");
+    frame.setAttribute("frameborder", "0");
+    frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+    frame.setAttribute("loading", "lazy");
+    frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    frame.style.cssText = "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:0;pointer-events:none;";
+    wrap.appendChild(frame);
+
+    /* Transparent lid: kills the hover title/share overlay's clickability. */
+    const lid = document.createElement("div");
+    lid.style.cssText = "position:absolute;inset:0;background:transparent;";
+    wrap.appendChild(lid);
+    parent.insertBefore(wrap, v.nextSibling);
+
+    /* Contain, never crop: the largest 16:9 rectangle that fits the slot, centred. */
+    const fit = () => {
+      const w = wrap.clientWidth, h = wrap.clientHeight;
+      if (!w || !h) return;
+      const roomy = w / h > 16 / 9;
+      frame.style.width = (roomy ? Math.floor(h * 16 / 9) : w) + "px";
+      frame.style.height = (roomy ? h : Math.floor(w * 9 / 16)) + "px";
+    };
+    fit();
+    if (window.ResizeObserver) { const ro = new ResizeObserver(fit); ro.observe(wrap); }
+
+    if (!this.yio) {
+      this.yio = new IntersectionObserver((es) => {
+        es.forEach((e) => {
+          const f = e.target.querySelector("iframe");
+          if (!f) return;
+          if (e.isIntersecting) {
+            if (!f.src) {
+              f.src = ytEmbed(e.target.getAttribute("data-yt-id"));
+              if (window.CMS) window.CMS.track("video", "yt:" + e.target.getAttribute("data-yt-id"));
+            }
+          } else if (f.src) {
+            f.removeAttribute("src");
+          }
+        });
+      }, { threshold: 0.15, rootMargin: "300px 0px" });
+    }
+    this.yio.observe(wrap);
+  }
+
+  unmountYT(v) {
+    const parent = v.parentElement;
+    if (!parent) return;
+    const stale = parent.querySelector(":scope > [data-yt-wrap]");
+    if (stale) { stale.remove(); v.style.display = ""; }
   }
 
   applyCaseAccent(view) {

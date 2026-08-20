@@ -215,14 +215,23 @@
           v.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;";
           el.parentNode.insertBefore(v, el);
         }
-        if (v.getAttribute("data-vsrc") !== src) { v.setAttribute("data-vsrc", src); v.src = src; }
+        if (v.getAttribute("data-vsrc") !== src) {
+          v.setAttribute("data-vsrc", src);
+          /* YouTube URLs are mounted as an iframe by the site, so never feed them to <video>. */
+          if (/(youtube\.com|youtu\.be)/i.test(src)) { v.removeAttribute("src"); v.removeAttribute("data-observed"); }
+          else v.src = src;
+        }
         el.style.display = "none";
       } else {
         var stale = el.previousElementSibling;
         if (stale && stale.getAttribute && stale.getAttribute("data-cms-swap") === key) stale.remove();
         el.style.display = "";
         if (tag === "video") {
-          if (src && el.getAttribute("data-vsrc") !== src) { el.setAttribute("data-vsrc", src); el.src = src; }
+          if (src && el.getAttribute("data-vsrc") !== src) {
+            el.setAttribute("data-vsrc", src);
+            if (/(youtube\.com|youtu\.be)/i.test(src)) { el.removeAttribute("src"); el.removeAttribute("data-observed"); }
+            else el.src = src;
+          }
         } else if (src && el.getAttribute("src") !== src) {
           el.setAttribute("src", src);
         }
