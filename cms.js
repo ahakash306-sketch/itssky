@@ -215,14 +215,15 @@
           v.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;";
           el.parentNode.insertBefore(v, el);
         }
-        if (v.getAttribute("data-vsrc") !== src) { v.setAttribute("data-vsrc", src); v.src = src; }
+        /* The site attaches sources itself (webm + fallback), so only the path is set here. */
+        if (v.getAttribute("data-vsrc") !== src) v.setAttribute("data-vsrc", src);
         el.style.display = "none";
       } else {
         var stale = el.previousElementSibling;
         if (stale && stale.getAttribute && stale.getAttribute("data-cms-swap") === key) stale.remove();
         el.style.display = "";
         if (tag === "video") {
-          if (src && el.getAttribute("data-vsrc") !== src) { el.setAttribute("data-vsrc", src); el.src = src; }
+          if (src && el.getAttribute("data-vsrc") !== src) el.setAttribute("data-vsrc", src);
         } else if (src && el.getAttribute("src") !== src) {
           el.setAttribute("src", src);
         }

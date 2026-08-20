@@ -1437,29 +1437,84 @@ class Component extends DCLogic {
     document.querySelectorAll("[data-reveal]:not(.in)").forEach((el) => this.io.observe(el));
   }
 
-  scanVideos() {
+scanVideos() {
     if (!this.vio) {
       this.vio = new IntersectionObserver((es) => {
         es.forEach((e) => {
+          const v = e.target;
           if (e.isIntersecting) {
-            const p = e.target.play(); if (p && p.catch) p.catch(() => {});
-            if (window.CMS && !e.target.dataset.tracked) { e.target.dataset.tracked = "1"; window.CMS.track("video", (e.target.dataset.vsrc || "").split("/").pop()); }
-          } else { e.target.pause(); }
+            this.loadVideo(v);
+            const p = v.play(); if (p && p.catch) p.catch(() => {});
+            if (window.CMS && !v.dataset.tracked) { v.dataset.tracked = "1"; window.CMS.track("video", (v.dataset.vsrc || "").split("/").pop()); }
+          } else { v.pause(); }
         });
-      }, { threshold: 0.25 });
+      }, { threshold: 0.25, rootMargin: "200px 0px" });
     }
-    document.querySelectorAll("video[data-autoplay-in-view]:not([data-observed])").forEach((v) => {
-      v.setAttribute("data-observed", "");
+    document.querySelectorAll("video[data-autoplay-in-view]").forEach((v) => {
+      const url = v.getAttribute("data-vsrc") || "";
+      /* Re-arm when the CMS points the slot at a different clip. */
+      if (v.dataset.armed && v.dataset.armed !== url) {
+        v.pause();
+        v.removeAttribute("poster");
+        while (v.firstChild) v.removeChild(v.firstChild);
+        v.removeAttribute("src");
+        if (v.dataset.blobUrl) { URL.revokeObjectURL(v.dataset.blobUrl); delete v.dataset.blobUrl; }
+        delete v.dataset.armed;
+        delete v.dataset.loaded;
+        delete v.dataset.tracked;
+      }
+      if (v.dataset.armed) return;
+      if (!url) return;
+      v.dataset.armed = url;
       v.muted = true;
       v.loop = true;
       v.playsInline = true;
       v.controls = false;
-      const url = v.getAttribute("data-vsrc");
-      if (url && !v.src) {
-        fetch(url).then((r) => r.blob()).then((b) => { v.src = URL.createObjectURL(b); v.load(); }).catch(() => { v.src = url; });
-      }
+      v.preload = "none";
+      v.disablePictureInPicture = true;
+      v.setAttribute("muted", "");
+      v.setAttribute("loop", "");
+      v.setAttribute("playsinline", "");
+      /* Poster is the clip's own first frame, same basename: only attached if it exists,
+         so a missing one degrades to the element's background rather than a broken image. */
+      const poster = url.replace(/\.(mp4|webm|mov)(\?.*)?$/i, "") + ".jpg";
+      const probe = new Image();
+      probe.onload = () => { if (v.dataset.armed === url) v.setAttribute("poster", poster); };
+      probe.src = poster;
       this.vio.observe(v);
     });
+  }
+
+  /* Loaded on first approach, never at parse time: nothing downloads until the slot is
+     near the viewport. WebM is preferred when the browser plays it and the file exists;
+     otherwise the authored file. Bytes come through fetch + Blob URL because some hosts
+     (and this preview) refuse direct media URLs on a <video> element — a plain src is
+     kept as the last resort so a normal server still works if fetch is blocked. */
+  loadVideo(v) {
+    if (v.dataset.loaded) return;
+    const url = v.getAttribute("data-vsrc") || "";
+    if (!url) return;
+    v.dataset.loaded = "1";
+    const base = url.replace(/\.(mp4|webm|mov)(\?.*)?$/i, "");
+    const wantsWebm = !/\.webm(\?|$)/i.test(url) && !!v.canPlayType && !!v.canPlayType("video/webm");
+    const queue = wantsWebm ? [base + ".webm", url] : [url];
+
+    const mount = (blobUrl) => {
+      if (v.dataset.blobUrl) URL.revokeObjectURL(v.dataset.blobUrl);
+      v.dataset.blobUrl = blobUrl;
+      v.src = blobUrl;
+      v.load();
+      const p = v.play(); if (p && p.catch) p.catch(() => {});
+    };
+
+    const tryNext = (i) => {
+      if (i >= queue.length) { v.src = url; v.load(); return; }
+      fetch(queue[i])
+        .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+        .then((b) => mount(URL.createObjectURL(b)))
+        .catch(() => tryNext(i + 1));
+    };
+    tryNext(0);
   }
 
   applyCaseAccent(view) {

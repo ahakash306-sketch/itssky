@@ -16,7 +16,7 @@
 <style>
   /* The editor must preview the SITE's tokens, not the design system's defaults —
      otherwise the swatch you click is not the colour that ships. Mirrors the
-     :root block in index.html. */
+     :root block in Akash Minimal.dc.html. */
   :root {
     --ink: #0e0e0d; --edge: #1c1b18; --body-copy: #8b8880; --accent: #f2f0ed;
     --color-accent: #f2f0ed;
@@ -81,7 +81,7 @@
     <div style="display: flex; flex-direction: column; gap: 6px;">
       <button type="button" onClick="{{ doDiscard }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid var(--edge); background: transparent; color: #8b8880; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #4a5164; color: #fff;">Discard unpublished edits</button>
       <button type="button" onClick="{{ doRestore }}" style="padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,150,120,.28); background: transparent; color: #ffb59a; font-size: 12.5px; text-align: left; cursor: pointer;" style-hover="border-color: #ffb59a;">Undo last publish</button>
-      <a href="index.html?preview=1" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
+      <a href="Akash Minimal.dc.html?preview=1" target="_blank" rel="noopener" style="padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--body-copy); border: 1px solid var(--edge);" style-hover="border-color: var(--accent); color: var(--accent);">View site ↗</a>
       <sc-if value="{{ onServer }}" hint-placeholder-val="{{ false }}">
         <button type="button" onClick="{{ doLogout }}" style="padding: 9px 12px; border-radius: 10px; border: 0; background: transparent; color: #55524c; font-size: 12px; text-align: left; cursor: pointer;" style-hover="color: #fff;">Sign out</button>
       </sc-if>
@@ -143,7 +143,7 @@
     <sc-if value="{{ needsSite }}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 16px; padding: 15px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
         <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">Open the portfolio once so the panel can read its current copy — until then text fields have nothing to load.</p>
-        <a href="index.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+        <a href="Akash Minimal.dc.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
       </div>
     </sc-if>
 
@@ -352,7 +352,7 @@
                           <button type="button" onClick="{{ f.upload }}" style="flex: none; padding: 9px 14px; border-radius: 9px; border: 1px solid rgba(110,163,255,.4); background: rgba(110,163,255,.1); color: #cfe0ff; font-size: 12.5px; cursor: pointer;">Upload photo / video</button>
                         </sc-if>
                         <sc-if value="{{ f.isVideo }}" hint-placeholder-val="{{ false }}">
-                          <span style="flex: none; padding: 4px 9px; border-radius: 999px; background: rgba(110,163,255,.14); color: #cfe0ff; font-size: 11px;">autoplay · loop · muted</span>
+                          <span style="flex: none; padding: 4px 9px; border-radius: 999px; background: rgba(110,163,255,.14); color: #cfe0ff; font-size: 11px;">autoplay · loop · muted · webm + poster auto</span>
                         </sc-if>
                       </div>
                     </sc-if>
@@ -397,7 +397,7 @@
           <sc-if value="{{ needsReload }}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,190,90,.3); background: rgba(255,190,90,.07);">
               <p style="margin: 0; flex: 1; min-width: 220px; font-size: 13px; line-height: 1.6; color: #f0d5a8;">This page's fields load from the site itself. Open the portfolio once (or reload it if it's already open), then come back.</p>
-              <a href="index.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
+              <a href="Akash Minimal.dc.html?preview=1" target="_blank" rel="noopener" style="flex: none; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,190,90,.45); font-size: 13px; color: #f0d5a8;">Open the site ↗</a>
             </div>
           </sc-if>
 
@@ -432,13 +432,16 @@ function layoutKey(entry) {
   return entry.format || NATIVE_FORMAT[entry.source || entry.id] || null;
 }
 
+/* A media value counts as video when it points at a clip file. */
+const isVidSrc = (s) => /\.(mp4|webm|mov)(\?|$)/i.test(String(s || ""));
+
 /* Structured schema for the data-driven product format. */
 const DATA_SCHEMA = [
   { title: "Header", fields: [
     { path: "statLead", label: "Stat (accent)", rows: 1 },
     { path: "statRest", label: "Headline remainder", rows: 2 },
     { path: "lede", label: "Standfirst", rows: 3 },
-    { path: "heroSrc", label: "Hero media", rows: 1, hint: "Photo or video path — .mp4 plays as video" }
+    { path: "heroSrc", label: "Hero media", rows: 1, hint: "Image path or .mp4 clip — .webm and .jpg poster are picked up automatically" }
   ] },
   { title: "Fact rail", repeat: "facts", of: [
     { path: "k", label: "Label", rows: 1 },
@@ -519,7 +522,7 @@ class Component extends DCLogic {
     }
     /* Pull every editable field out of the site's source so no page visit is needed. */
     /* Home page and case studies are one file now — one harvest covers both. */
-    if (window.CMS) window.CMS.harvestFromSource("index.html")
+    if (window.CMS) window.CMS.harvestFromSource("Akash Minimal.dc.html")
       .then(() => this.setState((s) => ({ tick: s.tick + 1 })));
   }
   componentWillUnmount() {
@@ -718,7 +721,7 @@ class Component extends DCLogic {
         const ov = window.CMS.mediaFor(f.key, ns) || {};
         const def = mdefs[f.key] || {};
         const setSrc = (src) => {
-          window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : "image", src });
+          window.CMS.setMedia(f.key, ns, { type: isVidSrc(src) ? "video" : "image", src });
           this.flash("Saved");
         };
         out[out.length - 1].fields.push({
@@ -737,7 +740,7 @@ class Component extends DCLogic {
           onInput: (e) => {
             const t = (window.CMS.mediaFor(f.key, ns) || def).type || "image";
             const src = e.target.value;
-            window.CMS.setMedia(f.key, ns, { type: /\.(mp4|webm|mov)$/i.test(src) ? "video" : t, src });
+            window.CMS.setMedia(f.key, ns, { type: isVidSrc(src) ? "video" : t, src });
             this.flash("Saved");
           },
           reset: () => { window.CMS.setMedia(f.key, ns, null); this.flash("Reverted"); }
@@ -780,9 +783,9 @@ class Component extends DCLogic {
     const field = (path, label, rows) => (isMediaPath(path) ? {
       media: true, text: false, rows: 1, label, noSelect: true, hasSelect: false,
       upload: () => this.pickFile((src) => { window.CMS.setDetail(id, path, src); this.flash("Saved"); }),
-      type: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "video" : "image",
-      isVideo: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")),
-      typeLabel: /\.(mp4|webm|mov)$/i.test(String(get(path) || "")) ? "Video" : "Photo",
+      type: isVidSrc(get(path)) ? "video" : "image",
+      isVideo: isVidSrc(get(path)),
+      typeLabel: isVidSrc(get(path)) ? "Video" : "Photo",
       placeholder: "uploads/file.jpg or uploads/clip.mp4",
       value: String(get(path) || ""),
       setType: () => {},
@@ -836,10 +839,10 @@ class Component extends DCLogic {
       const ov = C.mediaFor(key) || {};
       const def = C.mediaDefaults()[key] || {};
       const src = ov.src !== undefined && ov.src !== "" ? ov.src : (def.src || "");
-      const set = (v) => { C.setMedia(key, null, { type: /\.(mp4|webm|mov)$/i.test(v) ? "video" : "image", src: v }); this.flash("Saved"); };
+      const set = (v) => { C.setMedia(key, null, { type: isVidSrc(v) ? "video" : "image", src: v }); this.flash("Saved"); };
       return {
         media: true, text: false, hasHint: false, hint: "",
-        label, typeLabel: /\.(mp4|webm|mov)$/i.test(src) ? "Video" : "Photo",
+        label, typeLabel: isVidSrc(src) ? "Video" : "Photo",
         value: src, placeholder: "uploads/photo.jpg",
         upload: () => this.pickFile(set),
         onInput: (e) => set(e.target.value),
@@ -986,7 +989,7 @@ class Component extends DCLogic {
           items: rows.map((p) => ({
             ...p,
             meta: (p.tag || "") + (p.soon ? " · coming soon" : ""),
-            caseHref: "index.html?preview=1#/works/" + (p.slug || slugify(p.title)),
+            caseHref: "Akash%20Minimal.dc.html?preview=1#/works/" + (p.slug || slugify(p.title)),
             thumbCss: p.img ? 'url("' + p.img + '")' : "none",
             edit: () => this.setState({ editing: p.id, editTab: "card" }),
             dup: () => {
@@ -1008,7 +1011,7 @@ class Component extends DCLogic {
       tabPage: () => this.setState({ editTab: "page" }),
       tabCardStyle: this.pillStyle(this.state.editTab === "card"),
       tabPageStyle: this.pillStyle(this.state.editTab === "page"),
-      entryHref: entry ? "index.html?preview=1#/works/" + (entry.slug || slugify(entry.title)) : "#",
+      entryHref: entry ? "Akash%20Minimal.dc.html?preview=1#/works/" + (entry.slug || slugify(entry.title)) : "#",
       formatNote: fmt ? fmt.note : "",
       noPageFields: !!entry && !pageGroups.length && !(fmt && fmt.kind === "prefix"),
       needsReload: !!entry && !pageGroups.length && !!(fmt && fmt.kind === "prefix"),
