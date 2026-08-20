@@ -1,0 +1,301 @@
+From 9c20f3b6748deeb580bf17e416149925d20cfefa Mon Sep 17 00:00:00 2001
+From: Claude <assistant@example.com>
+Date: Thu, 20 Aug 2026 08:14:03 +0000
+Subject: [PATCH] Pre-render index.html at deploy time to fix LCP/CSR
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds a GitHub Actions build step that snapshots the fully-rendered
+page (after React/Babel/content.json have resolved) and deploys that
+as index.html, instead of shipping the raw {{ }} template shell.
+
+No existing file is modified — support.js, cms.js, case-data.js,
+image-slot.js, content.json, admin.html, and the whole edit/publish
+workflow are untouched. Editing in the Studio and committing
+content.json still works exactly as before.
+
+New files only:
+- package.json          build-only Playwright dependency
+- scripts/prerender.mjs the snapshot script
+- .github/workflows/deploy.yml   builds + deploys on push
+
+One manual step needed once: repo Settings -> Pages -> Build and
+deployment -> Source: GitHub Actions (currently likely set to
+'Deploy from a branch').
+---
+ .github/workflows/deploy.yml |  58 ++++++++++++
+ package.json                 |  12 +++
+ scripts/prerender.mjs        | 176 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 246 insertions(+)
+ create mode 100644 .github/workflows/deploy.yml
+ create mode 100644 package.json
+ create mode 100644 scripts/prerender.mjs
+
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+new file mode 100644
+index 0000000..6813069
+--- /dev/null
++++ b/.github/workflows/deploy.yml
+@@ -0,0 +1,58 @@
++name: Build and deploy site
++
++# Runs on every push to main (the live site) and on this fix's branch, so
++# you can watch the build succeed on the branch — and download/inspect the
++# result — before anything ever reaches the live domain. Only a push to
++# main triggers the actual deploy step.
++on:
++  push:
++    branches:
++      - main
++      - perf/prerender-lcp-fix
++
++permissions:
++  contents: read
++  pages: write
++  id-token: write
++
++concurrency:
++  group: "pages"
++  cancel-in-progress: false
++
++jobs:
++  build:
++    runs-on: ubuntu-latest
++    steps:
++      - name: Checkout
++        uses: actions/checkout@v4
++
++      - name: Set up Node
++        uses: actions/setup-node@v4
++        with:
++          node-version: 20
++
++      - name: Install build tooling
++        run: npm install
++
++      - name: Install headless Chromium
++        run: npx playwright install --with-deps chromium
++
++      - name: Pre-render the site
++        run: npm run prerender
++
++      - name: Upload pages artifact
++        uses: actions/upload-pages-artifact@v3
++        with:
++          path: dist
++
++  deploy:
++    if: github.ref == 'refs/heads/main'
++    needs: build
++    runs-on: ubuntu-latest
++    environment:
++      name: github-pages
++      url: ${{ steps.deployment.outputs.page_url }}
++    steps:
++      - name: Deploy to GitHub Pages
++        id: deployment
++        uses: actions/deploy-pages@v4
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000..826b758
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,12 @@
++{
++  "name": "itssky-build",
++  "private": true,
++  "type": "module",
++  "description": "Build-only tooling for itssky.co.in. Not part of the runtime site — used solely by the GitHub Actions workflow to produce a pre-rendered dist/ for deployment. The site itself still has zero build step for day-to-day editing.",
++  "scripts": {
++    "prerender": "node scripts/prerender.mjs"
++  },
++  "devDependencies": {
++    "playwright": "1.47.2"
++  }
++}
+diff --git a/scripts/prerender.mjs b/scripts/prerender.mjs
+new file mode 100644
+index 0000000..cb0f51a
+--- /dev/null
++++ b/scripts/prerender.mjs
+@@ -0,0 +1,176 @@
++// Build-only script. Runs in GitHub Actions, never in the browser.
++//
++// What it does, in plain terms:
++//   1. Copies the whole site (as-is) into dist/.
++//   2. Serves that copy on localhost, exactly like GitHub Pages would.
++//   3. Opens it in a real (headless) Chromium — the same browser engine a
++//      visitor's Chrome uses — and waits for the page to fully render:
++//      React + ReactDOM + Babel loaded, the {{ }} template resolved, and
++//      content.json applied.
++//   4. Saves that fully-rendered HTML as dist/index.html, replacing the
++//      version that ships with unresolved {{ }} placeholders.
++//
++// Nothing about support.js, cms.js, case-data.js, image-slot.js, or
++// content.json is touched or reimplemented. The exact same client-side
++// code still runs in every visitor's browser after this HTML loads — this
++// script only makes sure real content is already painted before that
++// code finishes downloading and executing, instead of a blank/placeholder
++// shell.
++//
++// Safety net: if the page still contains an unresolved {{ ... }} anywhere
++// after waiting, this script throws and exits non-zero. That fails the
++// GitHub Actions run loudly (a red X), which stops the broken snapshot
++// from ever being deployed — it does not fail silently.
++
++import { chromium } from "playwright";
++import http from "node:http";
++import fs from "node:fs";
++import fsp from "node:fs/promises";
++import path from "node:path";
++import { fileURLToPath } from "node:url";
++
++const __dirname = path.dirname(fileURLToPath(import.meta.url));
++const ROOT = path.resolve(__dirname, "..");
++const DIST = path.join(ROOT, "dist");
++const PORT = 4173;
++
++// Anything in here is build-only tooling and was never part of the live
++// site, so leaving it out of dist/ changes nothing about what visitors see.
++const EXCLUDE = new Set([
++  "node_modules",
++  ".git",
++  ".github",
++  "dist",
++  "scripts",
++  "package.json",
++  "package-lock.json",
++]);
++
++const MIME = {
++  ".html": "text/html; charset=utf-8",
++  ".js": "text/javascript; charset=utf-8",
++  ".mjs": "text/javascript; charset=utf-8",
++  ".json": "application/json; charset=utf-8",
++  ".css": "text/css; charset=utf-8",
++  ".svg": "image/svg+xml",
++  ".png": "image/png",
++  ".jpg": "image/jpeg",
++  ".jpeg": "image/jpeg",
++  ".gif": "image/gif",
++  ".webp": "image/webp",
++  ".mp4": "video/mp4",
++  ".woff": "font/woff",
++  ".woff2": "font/woff2",
++  ".ico": "image/x-icon",
++};
++
++function serveDir(rootDir, port) {
++  const server = http.createServer((req, res) => {
++    let urlPath = decodeURIComponent(req.url.split("?")[0]);
++    if (urlPath === "/") urlPath = "/index.html";
++    const filePath = path.join(rootDir, urlPath);
++    if (!filePath.startsWith(rootDir)) {
++      res.writeHead(403);
++      res.end();
++      return;
++    }
++    fs.readFile(filePath, (err, data) => {
++      if (err) {
++        res.writeHead(404);
++        res.end("Not found");
++        return;
++      }
++      const ext = path.extname(filePath).toLowerCase();
++      res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
++      res.end(data);
++    });
++  });
++  return new Promise((resolve) => server.listen(port, "127.0.0.1", () => resolve(server)));
++}
++
++async function copyRecursive(src, dest) {
++  const entries = await fsp.readdir(src, { withFileTypes: true });
++  await fsp.mkdir(dest, { recursive: true });
++  for (const entry of entries) {
++    if (EXCLUDE.has(entry.name)) continue;
++    const srcPath = path.join(src, entry.name);
++    const destPath = path.join(dest, entry.name);
++    if (entry.isDirectory()) {
++      await copyRecursive(srcPath, destPath);
++    } else {
++      await fsp.copyFile(srcPath, destPath);
++    }
++  }
++}
++
++async function main() {
++  console.log("Copying site files into dist/ ...");
++  await fsp.rm(DIST, { recursive: true, force: true });
++  await copyRecursive(ROOT, DIST);
++
++  console.log("Starting local static server ...");
++  const server = await serveDir(ROOT, PORT);
++
++  console.log("Launching headless Chromium ...");
++  const browser = await chromium.launch();
++  const page = await browser.newPage();
++
++  const issues = [];
++  page.on("pageerror", (err) => issues.push(`pageerror: ${err}`));
++  page.on("console", (msg) => {
++    if (msg.type() === "error") issues.push(`console.error: ${msg.text()}`);
++  });
++
++  console.log(`Navigating to http://localhost:${PORT}/ ...`);
++  await page.goto(`http://localhost:${PORT}/`, {
++    waitUntil: "networkidle",
++    timeout: 60000,
++  });
++
++  console.log("Waiting for the template to resolve (no more {{ }} left in the page) ...");
++  await page.waitForFunction(
++    () => !document.body || !document.body.innerText.includes("{{"),
++    { timeout: 30000 }
++  );
++
++  // Small settle window in case content.json applies in a second pass
++  // after the first template render.
++  await page.waitForTimeout(800);
++
++  const stillHasPlaceholders = await page.evaluate(() =>
++    document.body.innerText.includes("{{")
++  );
++
++  if (stillHasPlaceholders) {
++    await browser.close();
++    await new Promise((resolve) => server.close(resolve));
++    throw new Error(
++      "Page still contains unresolved {{ }} placeholders after waiting. " +
++        "Aborting so a broken snapshot never gets deployed."
++    );
++  }
++
++  console.log("Capturing fully-rendered HTML ...");
++  const html = await page.content();
++
++  await browser.close();
++  await new Promise((resolve) => server.close(resolve));
++
++  if (issues.length) {
++    console.warn(
++      "Non-fatal console/page errors seen during render (review if the site " +
++        "looks off after deploying):"
++    );
++    for (const issue of issues) console.warn(" -", issue);
++  }
++
++  await fsp.writeFile(path.join(DIST, "index.html"), html, "utf-8");
++  console.log(
++    `Wrote pre-rendered dist/index.html (${(html.length / 1024).toFixed(1)} KB)`
++  );
++}
++
++main().catch((err) => {
++  console.error("Prerender failed:", err);
++  process.exit(1);
++});
+-- 
+2.43.0
+
